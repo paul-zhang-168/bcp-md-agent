@@ -3,9 +3,11 @@ package com.bsi.md.agent.engine.script;
 import com.alibaba.fastjson.JSON;
 import com.bsi.framework.core.utils.ExceptionUtils;
 import com.bsi.framework.core.utils.StringUtils;
+import com.bsi.md.agent.engine.integration.Context;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.script.*;
+import java.util.HashMap;
 
 /**
  * js脚本引擎接口
@@ -57,11 +59,12 @@ public class AgJavaScriptEngine implements AgScriptEngine{
      * @param script
      * @return
      */
-    public Object execute(String script,String method) throws Exception{
+    public Object execute(String script,String method,Object[] args) throws Exception{
         Object result = eval(script);
         if( StringUtils.hasText(method) ){
             Invocable invocable = (Invocable) engine;
-            result = invocable.invokeFunction(method);
+            log.info("args:{}", JSON.toJSONString(args));
+            result = invocable.invokeFunction(method,args);
         }
         return result;
     }
@@ -71,12 +74,14 @@ public class AgJavaScriptEngine implements AgScriptEngine{
     }
 
     public static void main(String[] arr) throws Exception{
-
+        Context c = new Context();
+        c.setEnv(new HashMap());
+        c.put("1","2");
         String script = "importClass(com.bsi.utils.DBUtils);\n" +
-                "\n" +
-                "function execute(){\n" +
-                "   return DBUtils.execute(\"INSERT INTO price(materialCode,materialName,amount) VALUES('999','999',99.99);update price set materialName = '光11111' WHERE id=1;\");\n" +
+                "importClass(com.alibaba.fastjson.JSON);\n"+
+                "function execute(c){\n" +
+                "   return log.info(c.getEnv().get('1'))" +
                 "}";
-        System.out.println( JSON.toJSONString( AgJavaScriptEngine.getInstance().execute(script,"execute") ) );
+        System.out.println( JSON.toJSONString( AgJavaScriptEngine.getInstance().execute(script,"execute",new Object[]{c}) ) );
     }
 }

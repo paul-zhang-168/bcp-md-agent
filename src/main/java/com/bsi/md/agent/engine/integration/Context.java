@@ -11,21 +11,21 @@ public class Context {
     public Context(){
 
     }
-    private Map map = null;
+    private Map env = null;
 
-    public void setMap(Map map){
-        this.map = map;
+    public void setEnv(Map map){
+        this.env = map;
     }
 
-    public Map getMap(){
-        return this.map;
+    public Map getEnv(){
+        return this.env;
     }
 
     public void put(String key,Object value){
-        map.put(key,value);
+        env.put(key,value);
     }
 
     public Object get(String key){
-        return map.get(key);
+        return env.get(key);
     }
 }

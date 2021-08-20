@@ -78,8 +78,7 @@ public class AgJobService extends FwService {
                     JSONObject transformNodeConfig = conf.getJSONObject("transformNodeConfig");
                     JSONObject outputNodeConfig = conf.getJSONObject("outputNodeConfig");
 
-                    JSONObject globalConf = JSONObject.parseObject( agConfig.getConfigValue() );
-                    JSONObject configParam = globalConf.getJSONObject("config");
+                    JSONObject configParam = JSONObject.parseObject( agConfig.getConfigValue() );
 
                     AgNodeVo inputNode = getAgNodeVo(inputNodeConfig);
                     AgNodeVo outputNode = getAgNodeVo(outputNodeConfig);

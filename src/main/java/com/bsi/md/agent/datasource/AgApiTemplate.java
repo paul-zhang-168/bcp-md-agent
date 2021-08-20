@@ -10,4 +10,16 @@ import lombok.Data;
 public class AgApiTemplate {
     //api地址
     private String apiUrl;
+
+    //认证模式 (none:无认证，token:token认证)
+    private String authType;
+
+    //token地址
+    private String authUrl;
+
+    //token参数
+    private String authParam;
+
+    //token方法
+    private String authMethod;
 }

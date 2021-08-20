@@ -6,12 +6,11 @@ import com.bsi.md.agent.engine.script.AgJavaScriptEngine;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 转换接口
+ * js脚本转换
  * @author fish
  */
 @Slf4j
 public class AgJsScriptTransform implements AgTransform{
-    //js引擎
     //脚本
     protected String script;
     /**
@@ -22,7 +21,7 @@ public class AgJsScriptTransform implements AgTransform{
     public Object transform(Context context){
         Object result = null;
         try {
-            result = AgJavaScriptEngine.getInstance().execute(script,"transform");
+            result = AgJavaScriptEngine.getInstance().execute(script,"transform",new Object[]{context});
         }catch (Exception e){
             log.error("写入数据报错:{}", ExceptionUtils.getFullStackTrace(e));
         }

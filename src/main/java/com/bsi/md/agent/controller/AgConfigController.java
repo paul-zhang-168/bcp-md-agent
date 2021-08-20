@@ -98,7 +98,7 @@ public class AgConfigController {
         }catch (Exception e){
             log.error("验签失败，错误信息:{}",ExceptionUtils.getFullStackTrace(e));
             resp.setCode( FwHttpStatus.FORBIDDEN.value() );
-            resp.setMsg( "验证失败" );
+            resp.setMsg( "验证失败，不是来自iot的请求" );
         }
         return resp;
     }

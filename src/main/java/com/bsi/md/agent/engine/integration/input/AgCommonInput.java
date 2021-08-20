@@ -18,7 +18,7 @@ public class AgCommonInput implements AgInput{
     public Object read(Context context) {
         Object result = null;
         try {
-            result = AgJavaScriptEngine.getInstance().execute(script,"input");
+            result = AgJavaScriptEngine.getInstance().execute(script,"input",new Object[]{context});
         }catch (Exception e){
             log.error("写入数据报错:{}", ExceptionUtils.getFullStackTrace(e));
         }

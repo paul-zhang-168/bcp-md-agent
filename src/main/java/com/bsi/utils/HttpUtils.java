@@ -24,7 +24,7 @@ public class HttpUtils {
      * @param url
      * @param headers
      * @param body
-     * @return
+     * @return AgHttpResult
      */
     public AgHttpResult request(String method, String url, Map<String,String> headers, String body){
         HttpConfig config = HttpConfig.simpleCustom(12000);

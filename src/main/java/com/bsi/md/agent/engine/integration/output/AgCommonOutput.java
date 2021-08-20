@@ -17,7 +17,7 @@ public class AgCommonOutput implements AgOutput{
     public Object write(Context context) {
         Object result = null;
         try {
-            result = AgJavaScriptEngine.getInstance().execute(script,"output");
+            result = AgJavaScriptEngine.getInstance().execute(script,"output",new Object[]{context});
         }catch (Exception e){
             log.error("写入数据报错:{}", ExceptionUtils.getFullStackTrace(e));
         }

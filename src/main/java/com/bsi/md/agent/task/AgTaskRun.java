@@ -40,7 +40,7 @@ public class AgTaskRun extends FwTask {
             //2、调用集成引擎解析规则
             AgIntegrationEngine engine = AgEngineFactory.getJobEngine(config);
             Context context = new Context();
-            context.setMap(new JSONObject());
+            context.setEnv(new JSONObject());
             context.put("config",config);
 
             AgTaskBootStrap.custom().context(context).engine(engine).exec();
