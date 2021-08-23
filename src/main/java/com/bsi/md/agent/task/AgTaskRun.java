@@ -1,18 +1,22 @@
 package com.bsi.md.agent.task;
 
-import com.alibaba.fastjson.JSONObject;
 import com.bsi.framework.core.schedule.FwTask;
+import com.bsi.framework.core.utils.DateUtils;
 import com.bsi.framework.core.utils.EHCacheUtil;
 import com.bsi.framework.core.utils.ExceptionUtils;
+import com.bsi.framework.core.utils.FwSpringContextUtil;
 import com.bsi.md.agent.engine.factory.AgEngineFactory;
 import com.bsi.md.agent.engine.integration.AgIntegrationEngine;
 import com.bsi.md.agent.engine.integration.AgTaskBootStrap;
 import com.bsi.md.agent.engine.integration.Context;
+import com.bsi.md.agent.entity.AgJobParam;
 import com.bsi.md.agent.entity.vo.AgIntegrationConfigVo;
+import com.bsi.md.agent.service.AgJobParamService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 /**
@@ -31,6 +35,8 @@ public class AgTaskRun extends FwTask {
         //初始化日志记录实体类
         String errorId = UUID.randomUUID().toString().replaceAll("-","");
         String error;
+        AgJobParamService agJobParamService = FwSpringContextUtil.getBean("agJobParamService", AgJobParamService.class);
+        AgJobParam param = getJobParam();
         try{
             //配置日志参数，不同日志输出到不同文件
             MDC.put("taskId", taskId);
@@ -40,7 +46,7 @@ public class AgTaskRun extends FwTask {
             //2、调用集成引擎解析规则
             AgIntegrationEngine engine = AgEngineFactory.getJobEngine(config);
             Context context = new Context();
-            context.setEnv(new JSONObject());
+            context.setEnv(new HashMap());
             context.put("config",config);
 
             AgTaskBootStrap.custom().context(context).engine(engine).exec();
@@ -51,7 +57,22 @@ public class AgTaskRun extends FwTask {
         }finally {
             log.info( "====计划任务:{},执行结束,执行结果:{}====", taskId , result );
             MDC.remove("taskId");
+            agJobParamService.save( param );
         }
 
+    }
+
+    /**
+     * 获取任务参数
+     * @return AgJobParam
+     */
+    private AgJobParam getJobParam(){
+        AgJobParam param = FwSpringContextUtil.getBean("agJobParamService", AgJobParamService.class).getByJobId(Integer.parseInt(taskId));
+        if( param == null ){
+            param = new AgJobParam();
+            param.setJobId(Integer.parseInt(taskId));
+            param.setLastRunTime(DateUtils.now());
+        }
+        return param;
     }
 }
