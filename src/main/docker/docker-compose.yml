@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  bsi-fw-cofre:
+    image: swr.cn-north-4.myhuaweicloud.com/bsi-test-x86/proj-kx-kuxing:master
+    ports:
+      - "8080:8080"
+    #volumes:
+     # - /op/app/business-his-op:/tmp/business-his-op
+     # - /op/app/business-his-op/storage:/storage
+    environment:
+      - JAVA_OPTS=-Xmx1024M -Xms1024M -Xss256k -XX:MaxMetaspaceSize=256M -XX:MetaspaceSize=256M
+      - SPRING_PROFILES_ACTIVE=prod
+    deploy:
+      resources:
+        limits:
+          memory: 600m
