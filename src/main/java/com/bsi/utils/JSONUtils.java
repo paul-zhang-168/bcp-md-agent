@@ -1,6 +1,8 @@
 package com.bsi.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 import java.util.Map;
 
@@ -15,8 +17,29 @@ public class JSONUtils {
      * @param obj
      * @return String
      */
-    private static String toJson(Object obj){
+    public static String toJson(Object obj){
+        if(obj instanceof String){
+            return obj.toString();
+        }
         return JSON.toJSONString( obj );
+    }
+
+    /**
+     * json字符串转数组
+     * @param text
+     * @return
+     */
+    public static JSONArray parseArray(String text){
+        return JSON.parseArray(text);
+    }
+
+    /**
+     * json字符串转数组
+     * @param text
+     * @return
+     */
+    public static JSONObject parseObject(String text){
+        return JSON.parseObject(text);
     }
 
     /**
@@ -24,7 +47,7 @@ public class JSONUtils {
      * @param json
      * @return
      */
-    private static Map<String,Object> toMap(String json){
+    public static Map<String,Object> toMap(String json){
         return JSON.parseObject(json,Map.class);
     }
 

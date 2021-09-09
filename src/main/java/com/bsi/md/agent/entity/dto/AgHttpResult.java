@@ -19,7 +19,7 @@ public class AgHttpResult {
      * @param headerName
      * @return
      */
-    private Header getHeader(String headerName){
+    public Header getHeader(String headerName){
         Header[] headers = this.resp.getHeaders(headerName);
         return headers != null && headers.length > 0 ? headers[0] : null;
     }

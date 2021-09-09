@@ -3,6 +3,7 @@ package com.bsi.md.agent.engine.integration.output;
 import com.bsi.framework.core.utils.ExceptionUtils;
 import com.bsi.md.agent.engine.integration.Context;
 import com.bsi.md.agent.engine.script.AgJavaScriptEngine;
+import com.bsi.utils.JSONUtils;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -17,7 +18,7 @@ public class AgCommonOutput implements AgOutput{
     public Object write(Context context) {
         Object result = null;
         try {
-            result = AgJavaScriptEngine.getInstance().execute(script,"output",new Object[]{context});
+            result = AgJavaScriptEngine.getInstance().execute(script,"output",new Object[]{context,context.getData()});
         }catch (Exception e){
             log.error("写入数据报错:{}", ExceptionUtils.getFullStackTrace(e));
         }

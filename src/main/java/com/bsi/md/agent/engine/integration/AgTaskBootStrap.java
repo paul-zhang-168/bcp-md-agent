@@ -48,6 +48,10 @@ public class AgTaskBootStrap {
         log.debug("1.执行输入节点");
         Object obj = engine.input(context);
         context.put(AgConstant.AG_DATA,obj);
+        if(obj==null){
+            log.info("输入节点未查询到数据，结束任务");
+            return;
+        }
         log.debug("2.执行转换节点");
         obj = engine.transform(context);
         context.put(AgConstant.AG_DATA,obj);

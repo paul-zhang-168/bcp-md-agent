@@ -47,7 +47,7 @@ public class AgTaskRun extends FwTask {
             AgIntegrationEngine engine = AgEngineFactory.getJobEngine(config);
             Context context = new Context();
             context.setEnv(new HashMap());
-            context.put("config",config);
+            context.put("config", config.getParamMap());
 
             AgTaskBootStrap.custom().context(context).engine(engine).exec();
         }catch (Exception e){

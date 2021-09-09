@@ -20,7 +20,7 @@ public class AgCommonInput implements AgInput{
         try {
             result = AgJavaScriptEngine.getInstance().execute(script,"input",new Object[]{context});
         }catch (Exception e){
-            log.error("写入数据报错:{}", ExceptionUtils.getFullStackTrace(e));
+            log.error("查询数据报错:{}", ExceptionUtils.getFullStackTrace(e));
         }
         return result;
     }

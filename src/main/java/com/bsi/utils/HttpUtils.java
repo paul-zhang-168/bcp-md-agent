@@ -26,14 +26,15 @@ public class HttpUtils {
      * @param body
      * @return AgHttpResult
      */
-    public AgHttpResult request(String method, String url, Map<String,String> headers, String body){
+    public static AgHttpResult request(String method, String url, Map<String,String> headers, String body){
         HttpConfig config = HttpConfig.simpleCustom(12000);
+        HttpHeader header = HttpHeader.custom();
         if( MapUtils.isNotEmpty(headers) ){
             for( String key:headers.keySet() ){
-                HttpHeader.custom().other(key,headers.get(key));
+                header.other(key,headers.get(key));
             }
         }
-        config.method(HttpMethods.valueOf(method)).url(url).json(body);
+        config.method(HttpMethods.valueOf(method)).headers(header.build()).url(url).json(body);
         AgHttpResult result = new AgHttpResult();
         try{
             HttpResult rs = HttpClientUtil.sendAndGetResp( config,false );

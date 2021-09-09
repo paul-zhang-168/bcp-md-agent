@@ -1,5 +1,7 @@
 package com.bsi.md.agent.engine.integration;
 
+import com.bsi.md.agent.constant.AgConstant;
+
 import java.util.Map;
 
 /**
@@ -23,6 +25,14 @@ public class Context {
 
     public void put(String key,Object value){
         env.put(key,value);
+    }
+
+    public Object getParams(){
+        return env.get("config");
+    }
+
+    public Object getData(){
+        return env.get(AgConstant.AG_DATA);
     }
 
     public Object get(String key){
