@@ -41,7 +41,7 @@ public class AgConfigController {
      */
     @PostMapping("/iot/config")
     public Resp updateConfigForIot(HttpServletRequest request, @RequestBody AgConfigDto config) throws Exception{
-        log.info( "收到bcp控制台下发的配置信息:{}", JSON.toJSONString( config ) );
+        log.info( "收到bcp控制台通过iot通道下发的配置信息:{}", JSON.toJSONString( config ) );
         //IOT验签
         Resp rs = verify(request);
         if( FwHttpStatus.FORBIDDEN.value() == rs.getCode() ){
@@ -70,7 +70,7 @@ public class AgConfigController {
      */
     @PostMapping("/iot/datasource")
     public Resp updateDataSourceForIot(HttpServletRequest request,@RequestBody AgDataSourceDto dataSource) throws Exception{
-        log.info( "收到bcp控制台下发的数据源信息:{}", JSON.toJSONString( dataSource ) );
+        log.info( "收到bcp控制台通过iot通道下发的数据源信息:{}", JSON.toJSONString( dataSource ) );
         //IOT验签
         Resp rs = verify(request);
         if( FwHttpStatus.FORBIDDEN.value() == rs.getCode() ){
