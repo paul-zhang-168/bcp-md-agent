@@ -80,13 +80,13 @@ public class AgJobService extends FwService {
 
                     JSONObject configParam = JSONObject.parseObject( agConfig.getConfigValue() );
 
-                    AgNodeVo inputNode = getAgNodeVo(inputNodeConfig);
-                    AgNodeVo outputNode = getAgNodeVo(outputNodeConfig);
-                    AgNodeVo transformNode = getAgNodeVo(transformNodeConfig);
+//                    AgNodeVo inputNode = getAgNodeVo(inputNodeConfig);
+//                    AgNodeVo outputNode = getAgNodeVo(outputNodeConfig);
+//                    AgNodeVo transformNode = getAgNodeVo(transformNodeConfig);
 
-                    vo.setInputNode(inputNode);
-                    vo.setOutputNode(outputNode);
-                    vo.setTransformNode(transformNode);
+                    vo.setInputNode(inputNodeConfig);
+                    vo.setOutputNode(outputNodeConfig);
+                    vo.setTransformNode(transformNodeConfig);
                     vo.setParamMap(configParam.getInnerMap());
 
                     //初始化配置到缓存

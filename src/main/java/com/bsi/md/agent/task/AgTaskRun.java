@@ -1,10 +1,14 @@
 package com.bsi.md.agent.task;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.bsi.framework.core.schedule.FwTask;
 import com.bsi.framework.core.utils.DateUtils;
 import com.bsi.framework.core.utils.EHCacheUtil;
 import com.bsi.framework.core.utils.ExceptionUtils;
 import com.bsi.framework.core.utils.FwSpringContextUtil;
+import com.bsi.md.agent.datasource.AgApiTemplate;
+import com.bsi.md.agent.datasource.AgDatasourceContainer;
 import com.bsi.md.agent.engine.factory.AgEngineFactory;
 import com.bsi.md.agent.engine.integration.AgIntegrationEngine;
 import com.bsi.md.agent.engine.integration.AgTaskBootStrap;
@@ -48,6 +52,11 @@ public class AgTaskRun extends FwTask {
             Context context = new Context();
             context.setEnv(new HashMap());
             context.put("config", config.getParamMap());
+            //处理输入、输出、转换节点的配置
+            rebuildNode(config);
+            context.put("inputConfig",config.getInputNode());
+            context.put("outputConfig",config.getOutputNode());
+            context.put("transformConfig",config.getTransformNode());
 
             AgTaskBootStrap.custom().context(context).engine(engine).exec();
         }catch (Exception e){
@@ -74,5 +83,26 @@ public class AgTaskRun extends FwTask {
             param.setLastRunTime(DateUtils.now());
         }
         return param;
+    }
+
+
+    private void rebuildNode(AgIntegrationConfigVo config){
+        JSONObject in = config.getInputNode();
+        JSONObject out = config.getOutputNode();
+        JSONObject transform = config.getTransformNode();
+        //删除无用配置
+        in.remove("scriptContent");
+        out.remove("scriptContent");
+        transform.remove("scriptContent");
+        //处理路径问题
+        setRealpath(in);
+        setRealpath(out);
+    }
+
+    private void setRealpath(JSONObject obj){
+        AgApiTemplate a = AgDatasourceContainer.getApiDataSource(obj.getInteger("dataSource"));
+        if(a!=null){
+            obj.put("path",a.getApiUrl()+obj.getString("path"));
+        }
     }
 }

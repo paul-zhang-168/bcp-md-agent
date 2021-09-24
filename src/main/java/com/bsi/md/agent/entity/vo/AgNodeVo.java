@@ -25,5 +25,4 @@ public class AgNodeVo {
     //数据源id
     private String dataSourceId;
 
-
 }

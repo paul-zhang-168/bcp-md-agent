@@ -27,8 +27,36 @@ public class Context {
         env.put(key,value);
     }
 
+    /**
+     * 全局参数
+     * @return
+     */
     public Object getParams(){
         return env.get("config");
+    }
+
+    /**
+     * input参数
+     * @return
+     */
+    public Object inputConf(){
+        return env.get("inputConfig");
+    }
+
+    /**
+     * transform参数
+     * @return
+     */
+    public Object transformConf(){
+        return env.get("transformConfig");
+    }
+
+    /**
+     * output参数
+     * @return
+     */
+    public Object outputConf(){
+        return env.get("outputConfig");
     }
 
     public Object getData(){

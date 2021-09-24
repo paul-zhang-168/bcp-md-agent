@@ -9,6 +9,7 @@ import com.bsi.md.agent.entity.dto.AgHttpResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -17,6 +18,22 @@ import java.util.Map;
  */
 @Slf4j
 public class HttpUtils {
+
+    /**
+     * 调用http接口工具类
+     * @param method
+     * @param url
+     * @param headers
+     * @param body
+     * @return AgHttpResult
+     */
+    public static AgHttpResult post(String url, Map<String,String> headers, String body){
+        if( MapUtils.isEmpty(headers) ){
+            headers = new HashMap<>();
+        }
+        headers.put("Content-Type","application/json");
+        return request("POST",url,headers,body);
+    }
 
     /**
      * 调用http接口工具类

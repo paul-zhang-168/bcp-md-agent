@@ -1,7 +1,9 @@
 package com.bsi.utils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 /**
  * 日期工具类
@@ -16,6 +18,17 @@ public class DateUtils {
      */
     public static String nowDate(String pattern){
         DateTimeFormatter df = DateTimeFormatter.ofPattern(pattern);
-        return df.format( LocalDate.now() );
+        return df.format( LocalDateTime.now() );
+    }
+
+    /**
+     * 获取当前日期多少分钟之前的日期，为负数可以获取多少分钟之后的数据
+     * @param pattern
+     * @param minute
+     * @return String
+     */
+    public static String preMinuteForNow(Long minute,String pattern){
+        DateTimeFormatter df = DateTimeFormatter.ofPattern(pattern);
+        return df.format( LocalDateTime.now().minusMinutes(minute));
     }
 }
