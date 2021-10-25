@@ -196,12 +196,12 @@
         </discriminator>
         <sift>
             <!--具体的写日志appender，每一个taskId创建一个文件-->
-            <appender name="task-${taskId}" class="ch.qos.logback.core.FileAppender">
+            <appender name="task-${taskId}" class="ch.qos.logback.core.rolling.RollingFileAppender">
                 <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
                 <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                     <!-- 每天日志归档路径以及格式 -->
                     <fileNamePattern>${log.path}/task/task-${taskId}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
-                    <maxFileSize>20MB</maxFileSize>
+                    <maxFileSize>30MB</maxFileSize>
                     <!--日志文档保留天数-->
                     <maxHistory>60</maxHistory>
                     <!--日志文件最大占用空间-->
