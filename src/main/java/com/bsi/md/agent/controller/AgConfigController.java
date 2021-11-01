@@ -11,6 +11,7 @@ import com.bsi.md.agent.entity.dto.AgDataSourceDto;
 import com.bsi.md.agent.entity.dto.AgDataSourceDtoForIOT;
 import com.bsi.md.agent.service.AgConfigService;
 import com.bsi.md.agent.service.AgDataSourceService;
+import com.huaweicloud.sdk.iot.module.ItClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -141,7 +142,7 @@ public class AgConfigController {
         Resp resp = new Resp();
         //IOT验签
         try{
-            IoTEdgeUtil.getItClient().verify(request.getHeader("Authorization"));
+            IoTEdgeUtil.getItClient().verifyByDaemon( request.getHeader(ItClient.X_AUTHORIZATION) );
         }catch (Exception e){
             log.error("验签失败，错误信息:{}",ExceptionUtils.getFullStackTrace(e));
             resp.setCode( FwHttpStatus.FORBIDDEN.value() );
