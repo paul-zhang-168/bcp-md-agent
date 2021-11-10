@@ -102,7 +102,7 @@ public class AgJobService extends FwService {
 
 
                 }
-                FwScheduleUtils.addTasks(taskList);
+                FwScheduleUtils.clearAndAddTasks(taskList);
                 FwScheduleUtils.refreshTasks();
             }
 
