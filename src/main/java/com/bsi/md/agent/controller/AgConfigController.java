@@ -75,10 +75,10 @@ public class AgConfigController {
         AgConfigDto c = transform(config);
         log.info("转换之后的配置信息:{}",JSON.toJSONString(c));
         //IOT验签
-        Resp rs = verify(request);
-        if( FwHttpStatus.FORBIDDEN.value() == rs.getCode() ){
-            return rs;
-        }
+//        Resp rs = verify(request);
+//        if( FwHttpStatus.FORBIDDEN.value() == rs.getCode() ){
+//            return rs;
+//        }
         return updateConfig(c);
     }
 
@@ -94,10 +94,10 @@ public class AgConfigController {
         AgDataSourceDto ds = transform(dataSource);
         log.info("转换之后的数据源信息:{}",JSON.toJSONString(ds));
         //IOT验签
-        Resp rs = verify(request);
-        if( FwHttpStatus.FORBIDDEN.value() == rs.getCode() ){
-            return rs;
-        }
+//        Resp rs = verify(request);
+//        if( FwHttpStatus.FORBIDDEN.value() == rs.getCode() ){
+//            return rs;
+//        }
         return updateDataSource(ds);
     }
 
@@ -120,6 +120,7 @@ public class AgConfigController {
             JSONObject job = jobs.getJSONObject(i);
             JSONObject tmp = new JSONObject();
             tmp.put("jobId",job.getString("id"));
+            tmp.put("enable",job.getBoolean("enabled"));
             tmp.put("jobName",job.getString("name"));
             //输入节点组转
             JSONObject input = job.getJSONObject("input");
@@ -149,15 +150,36 @@ public class AgConfigController {
     private AgDataSourceDto transform(AgDataSourceDtoForIOT ds){
         AgDataSourceDto dto = new AgDataSourceDto();
         dto.setId(ds.getId());
-        dto.setName(ds.getName());
+
         dto.setDelFlag(ds.getDel_flag());
-        JSONObject obj = new JSONObject();
         //配置信息
         JSONObject cf = JSON.parseObject( ds.getConfig_values() );
+        dto.setName(cf.getString("name"));
         dto.setType( cf.getString("type") );
-        dto.setConfigValue( ds.getConfig_values() );
+        dto.setClassify(cf.getString("classify"));
+        if(("db").equals(dto.getType())){
+            cf.put("url",getDbUrl(cf.getString("classify"),cf));
+        }
+        dto.setConfigValue( cf.toJSONString() );
         return dto;
     }
+
+    /**
+     * 根据数据库类型生成连接字符串
+     * @param dbType
+     * @param obj
+     * @return
+     */
+    private String getDbUrl(String dbType,JSONObject obj){
+        String url="";
+        if( "oracle".equals( dbType ) ){
+            url ="dbc:oracle:thin:@//%s:%s/%s";
+        }else if( "sqlserver".equals( dbType ) ){
+            url = "jdbc:sqlserver://%s:%s;DatabaseName=%s";
+        }
+        return String.format(url,obj.getString("url"),obj.getString("port"),obj.getString("databaseName"));
+    }
+
     /**
      * 更新集成配置
      * @aram request
