@@ -52,6 +52,7 @@ public class AgDataSourceService extends FwService {
                             config.remove(k);
                         }
                     });
+                    
                     //api类型数据源处理
                     if( AgConstant.AG_NODETYPE_API.equals( ds.getType() ) ){
                         AgApiTemplate apiTemplate = new AgApiTemplate();
