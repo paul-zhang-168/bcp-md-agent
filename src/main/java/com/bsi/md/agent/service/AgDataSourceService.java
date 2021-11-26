@@ -47,7 +47,7 @@ public class AgDataSourceService extends FwService {
                     JSONObject config = JSONObject.parseObject( ds.getConfigValue() );
                     //解密在云端加密的数据
                     config.forEach((k,v)->{
-                        if("secret_".startsWith(k)){
+                        if(k.startsWith("secret_")){
                             config.put(k.toString().replace("secret_",""), DecryptUtils.decrypFromHWCloud(v.toString()));
                             config.remove(k);
                         }
