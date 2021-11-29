@@ -35,7 +35,7 @@ public class AgDataSourceService extends FwService {
     }
 
     public boolean refreshDataSource(){
-        Boolean flag = true;
+        boolean flag = true;
         int size = 0;
         try {
             List<AgDataSource> list = findAll();
@@ -48,7 +48,7 @@ public class AgDataSourceService extends FwService {
                     //解密在云端加密的数据//会多一些属性，待修改
                     config.forEach((k,v)->{
                         if(k.startsWith("secret_")){
-                            config.put(k.replace("secret_",""), DecryptUtils.decrypFromHWCloud(v.toString()));
+                            config.put(k.replace("secret_",""), DecryptUtils.decryptFromHWCloud(v.toString()));
                             //config.remove(k);
                         }
                     });
