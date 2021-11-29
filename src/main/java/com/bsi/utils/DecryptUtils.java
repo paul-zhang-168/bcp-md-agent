@@ -2,7 +2,11 @@ package com.bsi.utils;
 
 import com.bsi.framework.core.httpclient.utils.IoTEdgeUtil;
 import com.bsi.framework.core.utils.ExceptionUtils;
+import com.huawei.m2m.edge.daemon.util.TokenHolder;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author fish
@@ -15,9 +19,13 @@ public class DecryptUtils {
      * @param text
      * @return String
      */
-    public static String decrypFromHWCloud(String text){
+    public static String decryptFromHWCloud(String text){
         String result = "";
         try{
+            Optional<String> token= TokenHolder.getToken();
+            if(!token.isPresent()) {
+                Thread.sleep(60000L);
+            }
             result = IoTEdgeUtil.getItClient().decryptDataFromCloud(text);
         }catch (Exception e){
             log.info("调用华为解密方法失败，错误信息:{}", ExceptionUtils.getFullStackTrace(e));
