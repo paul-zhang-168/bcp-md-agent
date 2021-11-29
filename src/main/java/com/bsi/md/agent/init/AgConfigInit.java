@@ -1,5 +1,6 @@
 package com.bsi.md.agent.init;
 
+import com.bsi.framework.core.httpclient.utils.IoTEdgeUtil;
 import com.bsi.md.agent.service.AgDataSourceService;
 import com.bsi.md.agent.service.AgJobService;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +32,15 @@ public class AgConfigInit implements ApplicationRunner {
 	@Override
 	public void run(ApplicationArguments args) {
 		log.info("=======================开始初始化数据源和集成配置信息=======================");
+		try {
+			IoTEdgeUtil.getItClient();
+			log.info("=======================初始化IoTEdge服务=======================");
+		}catch (Exception ignored){
+
+		}
+
 		//1、初始化数据源
-		Boolean flag1 = agDataSourceService.refreshDataSource();
+		boolean flag1 = agDataSourceService.refreshDataSource();
         //2、初始化定时任务和实时接口
 		Boolean flag2 = agJobService.refreshJob();
 		if( !flag1 || !flag2 ){
