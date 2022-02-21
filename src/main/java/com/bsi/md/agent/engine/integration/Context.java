@@ -1,6 +1,7 @@
 package com.bsi.md.agent.engine.integration;
 
 import com.bsi.md.agent.constant.AgConstant;
+import com.bsi.md.agent.log.AgTaskLog;
 
 import java.util.Map;
 
@@ -63,6 +64,9 @@ public class Context {
         return env.get(AgConstant.AG_DATA);
     }
 
+    public AgTaskLog getResultLog(){
+        return (AgTaskLog) env.get("taskInfoLog");
+    }
     public Object get(String key){
         return env.get(key);
     }

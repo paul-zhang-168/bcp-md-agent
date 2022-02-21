@@ -3,6 +3,8 @@ package com.bsi.md.agent.engine.script;
 import com.bsi.framework.core.utils.ExceptionUtils;
 import com.bsi.framework.core.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.script.*;
 
@@ -11,8 +13,9 @@ import javax.script.*;
  * @author fish
  */
 
-@Slf4j
 public class AgJavaScriptEngine implements AgScriptEngine{
+
+    private static Logger info_log = LoggerFactory.getLogger("TASK_INFO_LOG");
 
     private static AgJavaScriptEngine instance = null;
 
@@ -39,14 +42,14 @@ public class AgJavaScriptEngine implements AgScriptEngine{
             this.engine = new ScriptEngineManager().getEngineByName("nashorn");
             ScriptContext sc = new SimpleScriptContext();
             Bindings bindings = new SimpleBindings();
-            bindings.put("log", log); // 向nashorn引擎注入logger对象
+            bindings.put("log", info_log); // 向nashorn引擎注入logger对象
             sc.setBindings(engine.createBindings(), ScriptContext.ENGINE_SCOPE);
             sc.getBindings(ScriptContext.ENGINE_SCOPE).putAll(bindings);
             engine.setBindings(sc.getBindings(ScriptContext.ENGINE_SCOPE), ScriptContext.ENGINE_SCOPE);
             //支持importClass
             engine.eval("load('nashorn:mozilla_compat.js')");
         }catch (Exception e){
-            log.error("javaScript引擎初始化失败:{}", ExceptionUtils.getFullStackTrace(e));
+            info_log.error("javaScript引擎初始化失败:{}", ExceptionUtils.getFullStackTrace(e));
             throw new RuntimeException("js脚本初始化失败");
         }
 

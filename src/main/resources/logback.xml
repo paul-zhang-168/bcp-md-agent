@@ -8,7 +8,7 @@
     <contextName>logback</contextName>
     <!-- name的值是变量的名称，value的值时变量定义的值。通过定义的值会被插入到logger上下文中。定义后，可以使“${}”来使用变量。 -->
     <property name="log.path" value="/bcp/logs" />
-    <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %contextName [%thread] %-5level %logger{50} - %msg%n" />
+    <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %contextName [%thread] %level %logger{50} - %msg%n" />
     <!--0. 日志格式和颜色渲染 -->
     <!-- 彩色日志依赖的渲染类 -->
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
@@ -37,7 +37,7 @@
         <file>${log.path}/info/info.log</file>
         <!--日志文档输出格式-->
         <encoder>
-            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%thread] [%logger{50}] [%msg]%n</pattern>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%level] [%thread] [%logger{50}] [%msg]%n</pattern>
             <charset>UTF-8</charset>
         </encoder>
         <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
@@ -64,7 +64,7 @@
         <file>${log.path}/error/error.log</file>
         <!--日志文档输出格式-->
         <encoder>
-            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%thread] [%logger{50}] [%msg]%n</pattern>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%level] [%thread] [%logger{50}] [%msg]%n</pattern>
             <charset>UTF-8</charset> <!-- 此处设置字符集 -->
         </encoder>
         <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
@@ -157,7 +157,7 @@
         <file>${log.path}/auditRun/auditRun.log</file>
         <!--日志文档输出格式-->
         <encoder>
-            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%thread] [%logger{50}] [%msg]%n</pattern>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%level] [%thread] [%logger{50}] [%msg]%n</pattern>
             <charset>UTF-8</charset>
         </encoder>
         <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
@@ -218,6 +218,9 @@
         </sift>
     </appender>
 
+    <logger name="TASK_INFO_LOG" additivity="false">
+        <appender-ref ref="sitInfo"/>
+    </logger>
     <!--
         <logger>用来设置某一个包或者具体的某一个类的日志打印级别、
         以及指定<appender>。<logger>仅有一个name属性，
@@ -248,7 +251,7 @@
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="INFO_FILE" />
         <appender-ref ref="ERROR_FILE" />
-        <appender-ref ref="sitInfo" />
+        <!-- <appender-ref ref="sitInfo" /> -->
     </root>
 
     <!-- 4.2 生产环境:输出到文档
