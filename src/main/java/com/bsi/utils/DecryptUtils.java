@@ -5,8 +5,9 @@ import com.bsi.framework.core.utils.ExceptionUtils;
 import com.huawei.m2m.edge.daemon.util.TokenHolder;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author fish
@@ -31,5 +32,16 @@ public class DecryptUtils {
             log.info("调用华为解密方法失败，错误信息:{}", ExceptionUtils.getFullStackTrace(e));
         }
        return result;
+    }
+
+    public static SecretKeySpec getSecretKeySpec(byte[] secretKeyBytes , String algorithmName){
+        return new SecretKeySpec(secretKeyBytes,algorithmName);
+    }
+
+    public static String symDecrypt(SecretKeySpec secretKeySpec,byte[] encryptByte,String algorithmName) throws Exception {
+        Cipher cipher = Cipher.getInstance( algorithmName);
+        cipher.init(Cipher.DECRYPT_MODE,secretKeySpec);
+        byte[] bytes = cipher.doFinal(encryptByte);
+        return new String(bytes);
     }
 }
