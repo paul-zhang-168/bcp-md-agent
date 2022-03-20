@@ -11,4 +11,6 @@ public interface AgScriptEngine {
      * @return
      */
     Object execute(String script,String method,Object[] args) throws Exception;
+
+    Object executeMethod(String method,Object[] args) throws Exception;
 }

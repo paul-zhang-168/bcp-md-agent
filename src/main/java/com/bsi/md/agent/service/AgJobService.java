@@ -7,7 +7,11 @@ import com.bsi.framework.core.service.FwService;
 import com.bsi.framework.core.utils.CollectionUtils;
 import com.bsi.framework.core.utils.EHCacheUtil;
 import com.bsi.framework.core.utils.ExceptionUtils;
+import com.bsi.framework.core.utils.StringUtils;
 import com.bsi.md.agent.constant.AgConstant;
+import com.bsi.md.agent.engine.pool.AgExecEnginePool;
+import com.bsi.md.agent.engine.script.AgJavaScriptEngine;
+import com.bsi.md.agent.engine.script.AgScriptEngine;
 import com.bsi.md.agent.entity.AgApiProxy;
 import com.bsi.md.agent.entity.AgConfig;
 import com.bsi.md.agent.entity.AgJob;
@@ -63,10 +67,14 @@ public class AgJobService extends FwService {
             //3、定时任务初始化
             List<AgTaskRun> taskList = new ArrayList<>();
             if (CollectionUtils.isNotEmpty(jobList)) {
+                //清空引擎
+                AgExecEnginePool.clearEngine();
                 jobSize = jobList.size();
                 for (AgJob job : jobList) {
                     //配置初始化到缓存中
                     AgConfig agConfig = agConfigMap.get(job.getConfigId());
+                    //初始化执行引擎
+                    buildEngine(job.getId(),agConfig.getPlugins());
                     AgIntegrationConfigVo vo = this.buildAgIntegrationConfigVo(agConfig,job.getConfigValue());
                     vo.setTaskId(job.getId());
                     vo.setTaskName(job.getName());
@@ -93,6 +101,8 @@ public class AgJobService extends FwService {
                 for(AgApiProxy api : apiProxyList){
                     //初始化api配置到缓存
                     AgConfig agConfig = agConfigMap.get(api.getConfigId());
+                    //初始化执行引擎
+                    buildEngine(api.getId(),agConfig.getPlugins());
                     AgIntegrationConfigVo vo = this.buildAgIntegrationConfigVo(agConfig,api.getConfigValue());
                     vo.setTaskName(api.getName());
                     vo.setTaskId(api.getId());
@@ -108,6 +118,19 @@ public class AgJobService extends FwService {
         return flag;
     }
 
+    private void buildEngine(String jobId,String plugins){
+        AgJavaScriptEngine execEngine = new AgJavaScriptEngine();
+        try{
+            if (StringUtils.hasText(plugins) ){
+                execEngine.eval(plugins);
+            }
+        }catch (Exception e){
+            log.error("插件编译出错:{}",ExceptionUtils.getFullStackTrace(e));
+        }finally {
+            AgExecEnginePool.addEngine(jobId,execEngine);
+        }
+        log.info("任务{}的执行引擎初始化完毕",jobId);
+    }
     private AgIntegrationConfigVo buildAgIntegrationConfigVo(AgConfig agConfig,String configValue){
         AgIntegrationConfigVo vo = new AgIntegrationConfigVo();
         JSONObject conf = JSONObject.parseObject(configValue);
@@ -121,6 +144,7 @@ public class AgJobService extends FwService {
         vo.setOutputNode(outputNodeConfig);
         vo.setTransformNode(transformNodeConfig);
         vo.setParamMap(configParam.getInnerMap());
+//        vo.setPlugins(agConfig.getPlugins());
         return vo;
     }
 

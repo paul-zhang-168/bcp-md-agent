@@ -67,6 +67,11 @@ public class AgJavaScriptEngine implements AgScriptEngine{
         return result;
     }
 
+    public Object executeMethod(String method,Object[] args) throws Exception{
+        Invocable invocable = (Invocable) engine;
+        return invocable.invokeFunction(method,args);
+    }
+
     public Object eval(String script) throws Exception{
         return engine.eval(script);
     }

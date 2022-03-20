@@ -55,6 +55,7 @@ public class AgConfigService extends FwService {
         cf.setName( config.getName() );
         cf.setId( config.getId() );
         cf.setConfigValue( cnfObj.getJSONObject("config")==null?"":cnfObj.getJSONObject("config").toJSONString() );
+        cf.setPlugins( cnfObj.getString("plugins") );
         cf.setEnable( true );
         agConfigRepository.save(cf);
 

@@ -7,6 +7,8 @@ import com.bsi.md.agent.engine.integration.AgJobEngine;
 import com.bsi.md.agent.engine.integration.input.AgInput;
 import com.bsi.md.agent.engine.integration.output.AgOutput;
 import com.bsi.md.agent.engine.integration.transform.AgTransform;
+import com.bsi.md.agent.engine.pool.AgExecEnginePool;
+import com.bsi.md.agent.engine.script.AgJavaScriptEngine;
 import com.bsi.md.agent.entity.vo.AgIntegrationConfigVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
@@ -33,12 +35,15 @@ public class AgEngineFactory {
         try{
             AgInput input = (AgInput) ClassUtils.getClass("com.bsi.md.agent.engine.integration.input."+inputNode.getOrDefault("className","AgCommonInput")).newInstance();
             input.setScript( inputNode.getString("scriptContent") );
+            input.setEngine( AgExecEnginePool.getEngine(config.getTaskId()) );
 
             AgTransform transform = (AgTransform) ClassUtils.getClass("com.bsi.md.agent.engine.integration.transform."+transformNode.getOrDefault("className","AgJsScriptTransform")).newInstance();
             transform.setScript( transformNode.getString("scriptContent") );
+            transform.setEngine( AgExecEnginePool.getEngine(config.getTaskId()) );
 
             AgOutput output = (AgOutput) ClassUtils.getClass("com.bsi.md.agent.engine.integration.output."+outputNode.getOrDefault("className","AgCommonOutput")).newInstance();
             output.setScript( outputNode.getString("scriptContent") );
+            output.setEngine( AgExecEnginePool.getEngine(config.getTaskId()) );
 
             engine.setInput(input);
             engine.setTransform(transform);

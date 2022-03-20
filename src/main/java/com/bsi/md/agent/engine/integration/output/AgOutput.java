@@ -1,6 +1,7 @@
 package com.bsi.md.agent.engine.integration.output;
 
 import com.bsi.md.agent.engine.integration.Context;
+import com.bsi.md.agent.engine.script.AgScriptEngine;
 
 /**
  * 输出接口
@@ -19,5 +20,12 @@ public interface AgOutput {
      * @return
      */
     String setScript(String script);
+
+    /**
+     * 设置执行引擎
+     * @param engine
+     * @return
+     */
+    void setEngine(AgScriptEngine engine);
 
 }

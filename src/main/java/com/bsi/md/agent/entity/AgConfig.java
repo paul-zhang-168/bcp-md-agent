@@ -18,4 +18,7 @@ public class AgConfig extends AgAbstractEntity {
     //配置数据
     @Column(name = "configValue",columnDefinition="ntext")
     private String configValue;
+    //插件
+    @Column(name = "plugins",columnDefinition="ntext")
+    private String plugins;
 }

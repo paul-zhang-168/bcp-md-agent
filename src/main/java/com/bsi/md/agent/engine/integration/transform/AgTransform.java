@@ -1,6 +1,7 @@
 package com.bsi.md.agent.engine.integration.transform;
 
 import com.bsi.md.agent.engine.integration.Context;
+import com.bsi.md.agent.engine.script.AgScriptEngine;
 
 /**
  * 转换接口
@@ -20,4 +21,11 @@ public interface AgTransform {
      * @return
      */
     String setScript(String script);
+
+    /**
+     * 设置执行引擎
+     * @param engine
+     * @return
+     */
+    void setEngine(AgScriptEngine engine);
 }

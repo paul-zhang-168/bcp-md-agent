@@ -30,4 +30,7 @@ public class AgIntegrationConfigVo {
     //输出节点类型
     private JSONObject outputNode;
 
+    //插件
+    private String plugins;
+
 }

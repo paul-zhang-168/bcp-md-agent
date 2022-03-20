@@ -1,6 +1,7 @@
 package com.bsi.md.agent.engine.integration.input;
 
 import com.bsi.md.agent.engine.integration.Context;
+import com.bsi.md.agent.engine.script.AgScriptEngine;
 
 /**
  * 输入接口
@@ -20,4 +21,10 @@ public interface AgInput {
      * @return
      */
     String setScript(String script);
+    /**
+     * 设置执行引擎
+     * @param engine
+     * @return
+     */
+    void setEngine(AgScriptEngine engine);
 }
