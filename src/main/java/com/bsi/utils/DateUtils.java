@@ -4,6 +4,7 @@ import com.bsi.framework.core.utils.Assert;
 import com.bsi.framework.core.utils.CalendarUtils;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -55,6 +56,15 @@ public class DateUtils{
     public static String getDateStrFromTime(long time,String pattern){
         Date date = new Date(time);
         return DateUtils.toString(date,pattern);
+    }
+
+    /**
+     * 获取当前日期多少分钟之前的毫秒数
+     * @param minute
+     * @return String
+     */
+    public static long getTimePreMinuteForNow(Long minute){
+        return LocalDateTime.now().minusMinutes(minute).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     public static Date getDate(String dateString,String pattern){
