@@ -15,12 +15,16 @@ import com.bsi.md.agent.engine.integration.AgIntegrationEngine;
 import com.bsi.md.agent.engine.integration.AgTaskBootStrap;
 import com.bsi.md.agent.engine.integration.Context;
 import com.bsi.md.agent.entity.AgConfig;
+import com.bsi.md.agent.entity.AgJob;
+import com.bsi.md.agent.entity.AgWarnMethod;
 import com.bsi.md.agent.entity.dto.*;
 import com.bsi.md.agent.entity.vo.AgIntegrationConfigVo;
 import com.bsi.md.agent.log.AgTaskLog;
 import com.bsi.md.agent.repository.AgConfigRepository;
 import com.bsi.md.agent.service.AgConfigService;
 import com.bsi.md.agent.service.AgDataSourceService;
+import com.bsi.md.agent.service.AgJobService;
+import com.bsi.md.agent.service.AgWarnMethodService;
 import com.bsi.md.agent.utils.AgConfigUtils;
 import com.huaweicloud.sdk.iot.module.ItClient;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +55,11 @@ public class AgConfigController {
     private AgDataSourceService agDataSourceService;
     @Autowired
     private AgConfigService agConfigService;
+    @Autowired
+    private AgWarnMethodService agWarnMethodService;
+    @Autowired
+    private AgJobService agJobService;
+
 
 
     /**
@@ -272,7 +281,49 @@ public class AgConfigController {
         log.info( "通过iot edge手动运行任务，参数:{}", JSON.toJSONString(param) );
         //IOT验签
         Resp rs = verify(request);
+        if( FwHttpStatus.FORBIDDEN.value() == rs.getCode() ){
+            return rs;
+        }
         return repair(param);
+    }
+
+    /**
+     * 下发告警配置
+     * @param param
+     * @throws Exception
+     */
+    @PostMapping("/console/warn-config")
+    public Resp acceptWarnConfig(@RequestBody AgTaskWarnConfDto param) throws Exception{
+        log.info( "收到bcp控制台下发的告警配置，参数:{}", JSON.toJSONString(param) );
+        return warnConfig(param);
+    }
+
+    /**
+     * 下发告警配置
+     * @param param
+     * @throws Exception
+     */
+    @PostMapping("/iot/warn-config")
+    public Resp acceptWarnConfigForIot(HttpServletRequest request,@RequestBody AgTaskWarnConfDto param) throws Exception{
+        log.info( "收到IoT Edge控制台下发的告警配置，参数:{}", JSON.toJSONString(param) );
+        //IOT验签
+        Resp rs = verify(request);
+        if( FwHttpStatus.FORBIDDEN.value() == rs.getCode() ){
+            return rs;
+        }
+        return warnConfig(param);
+    }
+
+    private Resp warnConfig(AgTaskWarnConfDto warnConf){
+        Resp resp = new Resp();
+        //1、获取到执行规则
+        AgIntegrationConfigVo config = JSON.parseObject( EHCacheUtil.getValue(AgConstant.AG_EHCACHE_JOB,warnConf.getTaskId()).toString(),AgIntegrationConfigVo.class);
+        if(config==null){
+            resp.setErrorCodeAndMsg(500,"前置机未找到taskId为{}的任务！");
+            return resp;
+        }
+        agWarnMethodService.updateTaskAndMethod(warnConf,config);
+        return resp;
     }
 
     private Resp repair(AgTaskParamDto param){

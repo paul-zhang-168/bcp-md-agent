@@ -31,6 +31,9 @@ public class AgConstant {
     public static final String AG_EHCACHE_JOB = "job_config";
     //任务EhCache
     public static final String AG_EHCACHE_API = "api_config";
+    //告警EhCache
+    public static final String AG_EHCACHE_WARN = "warn_config";
+
 
     //鉴权
     public static final String AG_AUTHORIZATION = "Authorization";

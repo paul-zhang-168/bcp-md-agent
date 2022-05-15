@@ -3,6 +3,7 @@ package com.bsi.md.agent.init;
 import com.bsi.framework.core.httpclient.utils.IoTEdgeUtil;
 import com.bsi.md.agent.service.AgDataSourceService;
 import com.bsi.md.agent.service.AgJobService;
+import com.bsi.md.agent.service.AgWarnMethodService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -25,6 +26,8 @@ public class AgConfigInit implements ApplicationRunner {
 	@Autowired
 	private AgDataSourceService agDataSourceService;
 
+	@Autowired
+	private AgWarnMethodService agWarnMethodService;
 	/**
 	 * 初始化计划任务
 	 * @param args
@@ -42,8 +45,11 @@ public class AgConfigInit implements ApplicationRunner {
 		//1、初始化数据源
 		boolean flag1 = agDataSourceService.refreshDataSource();
         //2、初始化定时任务和实时接口
-		Boolean flag2 = agJobService.refreshJob();
-		if( !flag1 || !flag2 ){
+		boolean flag2 = agJobService.refreshJob();
+		//3、初始化告警配置
+		boolean flag3 = agWarnMethodService.refreshWarnMethod();
+
+		if( !flag1 || !flag2 || !flag3){
 			log.error("初始化配置失败，系统退出。。。。。。。");
 			System.exit(0);
 		}

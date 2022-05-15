@@ -33,4 +33,6 @@ public class AgIntegrationConfigVo {
     //插件
     private String plugins;
 
+    //告警方式配置
+    private String warnMethodId;
 }

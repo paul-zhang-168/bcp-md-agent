@@ -41,6 +41,10 @@ public class AgJobService extends FwService {
     @Autowired
     private AgConfigService agConfigService;
 
+    //新增货哦这
+    public void save(AgJob job){
+        agJobRepository.save(job);
+    }
     /**
      * 查询系统中所有启用的定时任务
      *
@@ -79,6 +83,7 @@ public class AgJobService extends FwService {
                     vo.setTaskId(job.getId());
                     vo.setTaskName(job.getName());
                     vo.setConfigId(job.getConfigId());
+                    vo.setWarnMethodId(job.getWarnMethodId());
                     //初始化配置到缓存
                     EHCacheUtil.setValue(AgConstant.AG_EHCACHE_JOB,job.getId(),JSON.toJSONString(vo));
                     //启用的才去执行

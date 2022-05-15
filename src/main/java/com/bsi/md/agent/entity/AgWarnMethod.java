@@ -7,22 +7,18 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * api仓库
+ * 告警方式
  */
 @Entity
 @Data
-@Table(name="md_agent_job")
-public class AgJob extends AgAbstractEntity {
-    //所属配置id
-    private String configId;
+@Table(name="md_agent_warn_method")
+public class AgWarnMethod extends AgAbstractEntity {
     //名称
     private String name;
-    //cron表达式
-    private String cron;
-    //告警方式
-    private String warnMethodId;
-    //配置值
-    //配置数据
+    //类型
+    private String type;
+    //配置数据json串
     @Column(name = "configValue",columnDefinition="ntext")
     private String configValue;
+
 }
