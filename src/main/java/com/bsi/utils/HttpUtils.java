@@ -3,6 +3,7 @@ package com.bsi.utils;
 import com.bsi.framework.core.httpclient.common.*;
 import com.bsi.framework.core.httpclient.utils.HttpClientUtil;
 import com.bsi.framework.core.utils.ExceptionUtils;
+import com.bsi.framework.core.utils.RequestUtils;
 import com.bsi.md.agent.entity.dto.AgHttpResult;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
@@ -12,7 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +44,7 @@ public class HttpUtils {
         ar.setResult(result.getBody());
         return ar;
     }
-    
+
     /**
      * 调用http接口工具类
      * @param url
@@ -104,6 +104,18 @@ public class HttpUtils {
         return sendAndGetResult(config);
     }
 
+    /**
+     * 重定向
+     */
+    public static void sendRedirect(String url){
+        try {
+            RequestUtils.getResponse().sendRedirect(url);
+        }catch (Exception e){
+            info_log.error("重定向报错:{}",ExceptionUtils.getFullStackTrace(e));
+        }
+
+    }
+
     private static HttpConfig buildHttpConfig(String method, String url, Map<String,String> headers){
         HttpConfig config = HttpConfig.simpleCustom(80000);
         HttpHeader header = HttpHeader.custom();
@@ -131,5 +143,4 @@ public class HttpUtils {
         }
         return result;
     }
-
 }
