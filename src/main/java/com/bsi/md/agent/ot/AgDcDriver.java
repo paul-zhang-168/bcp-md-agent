@@ -12,6 +12,7 @@ import com.huaweicloud.sdk.iot.module.ModuleShadowNotificationCallback;
 import com.huaweicloud.sdk.iot.module.PointsCallback;
 import com.huaweicloud.sdk.iot.module.dto.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 
@@ -23,8 +24,9 @@ public class AgDcDriver implements PointsCallback, ModuleShadowNotificationCallb
      * 数采应用客户端，与边缘Hub建立MQTT连接
      */
     private DcClient dcClient;
-
+    @Autowired
     private AgConfigService agConfigService;
+    @Autowired
     private AgDataSourceService agDataSourceService;
     @PostConstruct
     void init() throws Exception {
