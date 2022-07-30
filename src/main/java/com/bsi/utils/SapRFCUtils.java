@@ -21,4 +21,16 @@ public class SapRFCUtils {
         AgSapRFCTemplate template = AgDatasourceContainer.getSapRfcDataSource(dataSourceId);
         return template.executeFunction(functionName,params);
     }
+
+    /**
+     * 执行sapRFC函数
+     * @param functionName 函数名称
+     * @param params 参数
+     * @param dataSourceId 数据源id
+     * @return Object 执行结果
+     */
+    public static Object executeNew(String functionName, Map<String,Object> params, String dataSourceId){
+        AgSapRFCTemplate template = AgDatasourceContainer.getSapRfcDataSource(dataSourceId);
+        return template.executeFunctionNew(functionName,params);
+    }
 }
