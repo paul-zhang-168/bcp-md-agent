@@ -45,6 +45,9 @@ public class AgDcDriver implements PointsCallback, ModuleShadowNotificationCallb
         }
     }
 
+    public DcClient getDcClient(){
+        return  dcClient;
+    }
     /**
      * 收到模块下行数采配置，消息需要缓存或持久化
      *进入边缘节点详情-》应用模块-》数采配置-》下发按钮
@@ -58,11 +61,9 @@ public class AgDcDriver implements PointsCallback, ModuleShadowNotificationCallb
         JSONObject defaultValue = obj.getJSONObject("properties").getJSONObject("default_values");
         //初始化数据源
         JSONObject otParam = obj.getJSONObject("properties").getJSONObject("connection_info");
-        log.info("otParam:{}",otParam.toJSONString());
         JSONArray dsArr = defaultValue.getJSONArray("bcp_ds");
         for(int i=0;i<dsArr.size();i++){
             AgDataSourceDto dto = JSON.parseObject(dsArr.getString(i),AgDataSourceDto.class);
-            log.info("dsDto:{}",JSON.toJSONString(dto));
             JSONObject cfv = JSON.parseObject(dto.getConfigValue());
             if(cfv.size()>0){
                 log.info("进行属性替换");
@@ -78,10 +79,11 @@ public class AgDcDriver implements PointsCallback, ModuleShadowNotificationCallb
                 for(int j=0;j<globalParams.size();j++){
                     JSONObject glParam = globalParams.getJSONObject(j);
                     glParam.put("value",otParam.getOrDefault(dto.getId()+"_"+glParam.get("key"),glParam.get("value")));
+                    glParam.put("source","ot");
                 }
             }
             dto.setConfigValue(cfv.toJSONString());
-            log.info("更新第{}条数据源，数据:{}",JSON.toJSONString(dto));
+            log.info("更新第{}条数据源，数据:{}",i,JSON.toJSONString(dto));
             //刷新数据源
             agDataSourceService.updateDS(dto);
         }
@@ -110,7 +112,7 @@ public class AgDcDriver implements PointsCallback, ModuleShadowNotificationCallb
         }
         //暂时返回连接成功，后续再处理
         DsConnectionState conn = new DsConnectionState();
-        conn.setConnectionStatus(ConnectionStatus.CONNECTED.toString());
+        conn.setConnectionStatus(ConnectionStatus.CONNECTED.name());
         conn.setInfo("连接成功");
         dcClient.notifyDsConnectionState( conn );
         log.info("over>>配置信息已经更新到前置机");
