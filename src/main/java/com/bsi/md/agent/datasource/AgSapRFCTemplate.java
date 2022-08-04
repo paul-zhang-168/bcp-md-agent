@@ -1,5 +1,6 @@
 package com.bsi.md.agent.datasource;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.bsi.framework.core.utils.ExceptionUtils;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * sapRfc类型数据源模板
@@ -93,6 +95,57 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
                 param.forEach((k,v)->{
                     paramList.setValue(k, v);
                 });
+            }
+            function.execute(jCoDestination);
+            // 获取RFC返回的字段值
+            JCoParameterList exportParam = function.getExportParameterList();
+            JCoParameterFieldIterator it = exportParam.getParameterFieldIterator();
+            // 遍历RFC返回的表对象
+            JCoParameterList tables = function.getTableParameterList();
+            Iterator<JCoField> iterator = tables.iterator();
+            while (iterator.hasNext()){
+                JCoField j = iterator.next();
+                JCoTable tb = j.getTable();
+                JSONArray detail = new JSONArray();
+                for (int i = 0; i < tb.getNumRows(); i++) {
+                    tb.setRow(i);
+                    JSONObject obj = new JSONObject();
+                    tb.forEach(f->{
+                        obj.put(f.getName(),f.getString());
+                    });
+                    detail.add(obj);
+                }
+                resultObj.put(j.getName(),detail);
+            }
+        }catch (Exception e){
+            info_log.error("调用jco函数报错,错误信息:{}", ExceptionUtils.getFullStackTrace(e));
+        }
+        return resultObj;
+    }
+
+    /**
+     * 执行jco查询函数
+     * @param functionName
+     * @param param
+     * @return
+     */
+    public Object execute(String functionName, Map<String,Object> param){
+        JSONObject resultObj = new JSONObject(true);
+        try{
+            JCoFunction function = jCoDestination.getRepository().getFunction(functionName);
+            Set<Map.Entry<String, Object>> entries = param.entrySet();
+            int row=1;
+            for (Map.Entry<String, Object> entity:entries) {
+                info_log.info("k:{},v:{},i:{}",entity.getKey(),entity.getValue(),row);
+                JCoTable inputTable = function.getTableParameterList().getTable(entity.getKey());
+                JSONArray arr = JSON.parseArray(JSON.toJSONString(entity.getValue()));
+                for (int j=0;j>arr.size();j++){
+                    JSONObject obj = arr.getJSONObject(j);
+                    obj.forEach((k,v)->{
+                        inputTable.setValue(k,v);
+                    });
+                }
+                inputTable.insertRow(row++);
             }
             function.execute(jCoDestination);
             // 获取RFC返回的字段值
