@@ -96,9 +96,6 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
                 });
             }
             function.execute(jCoDestination);
-            // 获取RFC返回的字段值
-            JCoParameterList exportParam = function.getExportParameterList();
-            JCoParameterFieldIterator it = exportParam.getParameterFieldIterator();
             // 遍历RFC返回的表对象
             JCoParameterList tables = function.getTableParameterList();
             Iterator<JCoField> iterator = tables.iterator();
@@ -149,9 +146,6 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
                 }
             }
             function.execute(jCoDestination);
-            // 获取RFC返回的字段值
-            JCoParameterList exportParam = function.getExportParameterList();
-            JCoParameterFieldIterator it = exportParam.getParameterFieldIterator();
             // 遍历RFC返回的表对象
             JCoParameterList tables = function.getTableParameterList();
             Iterator<JCoField> iterator = tables.iterator();
