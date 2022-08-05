@@ -150,11 +150,12 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
             function.getExportParameterList();
             JCoParameterList tables = function.getTableParameterList();
             Iterator<JCoField> iterator = tables.iterator();
-            if(function.getTableParameterList().getTable("ZRXXS_RES_SK")!=null){
-                info_log.info("t1:{}",function.getTableParameterList().getTable("ZRXXS_RES_SK").isEmpty());
-            }
-            if(function.getTableParameterList().getTable("ET_RETURN")!=null){
-                info_log.info("t2:{}",function.getTableParameterList().getTable("ET_RETURN").isEmpty());
+            try{
+                if(function.getTableParameterList().getTable("ET_RETURN")!=null){
+                    info_log.info("t2:{}",function.getTableParameterList().getTable("ET_RETURN").isEmpty());
+                }
+            }catch (Exception e){
+                info_log.info("error:",e.getMessage());
             }
             while (iterator.hasNext()){
                 JCoField j = iterator.next();
