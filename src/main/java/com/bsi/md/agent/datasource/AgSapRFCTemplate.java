@@ -148,13 +148,17 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
             function.execute(jCoDestination);
             info_log.info("function:{}",function.toString());
             info_log.info("exportParam:{}",function.toXML());
-            info_log.info("exportParam:{}",function.getExportParameterList().toString());
+            if(function.getExportParameterList()!=null){
+                info_log.info("exportParam:{}",function.getExportParameterList());
+            }
             // 遍历RFC返回的表对象
             JCoParameterList tables = function.getTableParameterList();
             Iterator<JCoField> iterator = tables.iterator();
             while (iterator.hasNext()){
                 JCoField j = iterator.next();
                 JCoTable tb = j.getTable();
+                info_log.info("JCoField:{}",j.toString());
+                info_log.info("tb:{}",tb.toString());
                 JSONArray detail = new JSONArray();
                 for (int i = 0; i < tb.getNumRows(); i++) {
                     tb.setRow(i);
