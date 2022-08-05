@@ -146,6 +146,9 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
                 }
             }
             function.execute(jCoDestination);
+            info_log.info("function:{}",function.toString());
+            info_log.info("exportParam:{}",function.toXML());
+            info_log.info("exportParam:{}",function.getExportParameterList().toString());
             // 遍历RFC返回的表对象
             JCoParameterList tables = function.getTableParameterList();
             Iterator<JCoField> iterator = tables.iterator();
