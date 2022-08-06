@@ -68,9 +68,7 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
         // 最大连接线程
         connectProperties.setProperty(DestinationDataProvider.JCO_PEAK_LIMIT, "10");
         if( MapUtils.isNotEmpty(otherParams) ){
-            otherParams.forEach((k,v)->{
-                connectProperties.setProperty(k,v);
-            });
+            otherParams.forEach((k,v)-> connectProperties.setProperty(k,v) );
         }
         AgRFCManager.registerProperties(destName,connectProperties);
         AgRFCManager.ping(destName);
@@ -83,17 +81,30 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
      * @param param
      * @return
      */
-    public Object executeQuery(String functionName, Map<String,Object> param){
+    public Object execute(String functionName, Map<String,Object> param){
         JSONObject resultObj = new JSONObject(true);
         try{
             JCoFunction function = jCoDestination.getRepository().getFunction(functionName);
             //设置参数
             if(MapUtils.isNotEmpty(param)){
-                JCoParameterList paramList = function.getImportParameterList();
-                param.forEach((k,v)->{
-                    info_log.info("k:{},v:{}",v.getClass().toString());
-                    paramList.setValue(k, v);
-                });
+                Set<Map.Entry<String, Object>> entries = param.entrySet();
+                for (Map.Entry<String, Object> entity:entries) {
+                    if(entity.getValue() instanceof ScriptObjectMirror){
+                        Collection<Object> a = ((ScriptObjectMirror) entity.getValue()).values();
+                        JSONArray arr = JSONArray.parseArray( JSON.toJSONString(a) );
+                        JCoTable inputTable = function.getTableParameterList().getTable(entity.getKey());
+                        for (int j=0;j<arr.size();j++){
+                            inputTable.appendRow();
+                            JSONObject obj = arr.getJSONObject(j);
+                            obj.forEach((k,v)->
+                                    inputTable.setValue(k,v)
+                            );
+                        }
+                    }else{
+                        JCoParameterList paramList = function.getImportParameterList();
+                        param.forEach((k,v)-> paramList.setValue(k, v));
+                    }
+                }
             }
             function.execute(jCoDestination);
             // 遍历RFC返回的表对象
@@ -101,6 +112,9 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
             Iterator<JCoField> iterator = tables.iterator();
             while (iterator.hasNext()){
                 JCoField j = iterator.next();
+                if( param.containsKey(j.getName()) ){
+                    continue;
+                }
                 JCoTable tb = j.getTable();
                 JSONArray detail = new JSONArray();
                 for (int i = 0; i < tb.getNumRows(); i++) {
@@ -113,88 +127,6 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
                 }
                 resultObj.put(j.getName(),detail);
             }
-        }catch (Exception e){
-            info_log.error("调用jco函数报错,错误信息:{}", ExceptionUtils.getFullStackTrace(e));
-        }
-        return resultObj;
-    }
-
-    /**
-     * 执行jco查询函数
-     * @param functionName
-     * @param param
-     * @return
-     */
-    public Object execute(String functionName, Map<String,Object> param){
-        JSONObject resultObj = new JSONObject(true);
-        try{
-            JCoContext.begin(jCoDestination);
-            JCoFunction function = jCoDestination.getRepository().getFunction(functionName);
-            Set<Map.Entry<String, Object>> entries = param.entrySet();
-            for (Map.Entry<String, Object> entity:entries) {
-                if(entity.getValue() instanceof ScriptObjectMirror){
-                    Collection<Object> a = ((ScriptObjectMirror) entity.getValue()).values();
-                    JSONArray arr = JSONArray.parseArray( JSON.toJSONString(a) );
-                    JCoTable inputTable = function.getTableParameterList().getTable(entity.getKey());
-                    for (int j=0;j>arr.size();j++){
-                        inputTable.appendRow();
-                        JSONObject obj = arr.getJSONObject(j);
-                        obj.forEach((k,v)->
-                            inputTable.setValue(k,v)
-                        );
-                    }
-                    info_log.info("inputTable:{}",inputTable.toXML());
-                    info_log.info("inputTable:{}",inputTable.toString());
-                }
-            }
-            function.execute(jCoDestination);
-            // 遍历RFC返回的表对象
-            if(function.getExportParameterList()!=null){
-                info_log.info("exportList:{}",function.getExportParameterList().toXML());
-            }
-            JCoParameterList tables = function.getTableParameterList();
-            Iterator<JCoField> iterator = tables.iterator();
-            info_log.info("tables:{}",tables.toXML());
-            info_log.info("tablesStr:{}",tables.toString());
-            try{
-                if(function.getTableParameterList().getTable("ET_RETURN")!=null){
-                    info_log.info("t2:{}",function.getTableParameterList().getTable("ET_RETURN").isEmpty());
-                }
-            }catch (Exception e){
-                info_log.info("error:",e.getMessage());
-            }
-            while (iterator.hasNext()){
-                JCoField j = iterator.next();
-                JCoTable tb = j.getTable();
-                info_log.info("JCoField:{}",j.getName());
-                info_log.info("numRows:{}",tb.getNumRows());
-                info_log.info("row:{}",tb.getRow());
-//                info_log.info("recordField:{}",tb.getRecordFieldIterator().hasNextField());
-//                info_log.info("itNext:{}",tb.iterator().hasNext());
-                info_log.info("empty:{}",tb.isEmpty());
-
-                JSONArray detail = new JSONArray();
-                boolean flag = !tb.isEmpty();
-                while (flag){
-                    JSONObject obj = new JSONObject();
-                    tb.forEach(f->{
-                        obj.put(f.getName(),f.getString());
-                    });
-                    detail.add(obj);
-                    flag = tb.nextRow();
-                }
-                info_log.info("tb:{}",tb.toXML());
-//                for (int i = 0; i < tb.getNumRows(); i++) {
-//                    tb.setRow(i);
-//                    JSONObject obj = new JSONObject();
-//                    tb.forEach(f->{
-//                        obj.put(f.getName(),f.getString());
-//                    });
-//                    detail.add(obj);
-//                }
-                resultObj.put(j.getName(),detail);
-            }
-            JCoContext.end(jCoDestination);
         }catch (Exception e){
             info_log.error("调用jco函数报错,错误信息:{}", ExceptionUtils.getFullStackTrace(e));
         }
