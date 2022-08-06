@@ -143,6 +143,8 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
                             inputTable.setValue(k,v)
                         );
                     }
+                    info_log.info("inputTable:{}",inputTable.toXML());
+                    info_log.info("inputTable:{}",inputTable.toString());
                 }
             }
             function.execute(jCoDestination);
