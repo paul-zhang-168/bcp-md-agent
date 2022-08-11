@@ -109,23 +109,25 @@ public class AgSapRFCTemplate implements AgDataSourceTemplate{
             function.execute(jCoDestination);
             // 遍历RFC返回的表对象
             JCoParameterList tables = function.getTableParameterList();
-            Iterator<JCoField> iterator = tables.iterator();
-            while (iterator.hasNext()){
-                JCoField j = iterator.next();
-                if( param.containsKey(j.getName()) ){
-                    continue;
+            if(tables!=null){
+                Iterator<JCoField> iterator = tables.iterator();
+                while (iterator.hasNext()){
+                    JCoField j = iterator.next();
+                    if( param.containsKey(j.getName()) ){
+                        continue;
+                    }
+                    JCoTable tb = j.getTable();
+                    JSONArray detail = new JSONArray();
+                    for (int i = 0; i < tb.getNumRows(); i++) {
+                        tb.setRow(i);
+                        JSONObject obj = new JSONObject();
+                        tb.forEach(f->{
+                            obj.put(f.getName(),f.getString());
+                        });
+                        detail.add(obj);
+                    }
+                    resultObj.put(j.getName(),detail);
                 }
-                JCoTable tb = j.getTable();
-                JSONArray detail = new JSONArray();
-                for (int i = 0; i < tb.getNumRows(); i++) {
-                    tb.setRow(i);
-                    JSONObject obj = new JSONObject();
-                    tb.forEach(f->{
-                        obj.put(f.getName(),f.getString());
-                    });
-                    detail.add(obj);
-                }
-                resultObj.put(j.getName(),detail);
             }
         }catch (Exception e){
             resultObj.put("sapError",e.getMessage());
