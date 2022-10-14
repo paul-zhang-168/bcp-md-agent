@@ -49,22 +49,25 @@ public class SHA256Utils {
 	 * @param body 加密字符串
 	 * @return 加密结果
 	 */
-	public static String generateSignature(String key, String body)
+	public static String generateSignature(String key, String body, String name)
 		throws InvalidKeyException, NoSuchAlgorithmException, IllegalStateException {
-		return base_64(hmacSHA256(key, body));
+		if(name == null){
+			name = "HamcSHA256";
+		}
+		return base_64(hMac(key, body, name));
 	}
 
 	/**
-	 * hamcSHA256加密算法
+	 * hamc加密算法
 	 *
 	 * @param macKey  秘钥key
 	 * @param macData 加密内容-响应消息体
 	 * @return 加密密文
 	 */
-	private static byte[] hmacSHA256(String macKey, String macData)
-		throws NoSuchAlgorithmException, InvalidKeyException, IllegalStateException {
-		SecretKeySpec secret = new SecretKeySpec(macKey.getBytes(), "HmacSHA256");
-		Mac mac = Mac.getInstance("HmacSHA256");
+	private static byte[] hMac(String macKey, String macData, String name)
+			throws NoSuchAlgorithmException, InvalidKeyException, IllegalStateException {
+		SecretKeySpec secret = new SecretKeySpec(macKey.getBytes(), name);
+		Mac mac = Mac.getInstance(name);
 		mac.init(secret);
 		return mac.doFinal(macData.getBytes(StandardCharsets.ISO_8859_1));
 	}
