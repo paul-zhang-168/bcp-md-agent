@@ -356,7 +356,10 @@ public class AgConfigController {
             context.put("outputConfig",config.getOutputNode());
             context.put("transformConfig",config.getTransformNode());
             context.put("taskInfoLog",agTaskLog);
-            AgTaskBootStrap.custom().context(context).engine(engine).exec();
+            Object resObj = AgTaskBootStrap.custom().context(context).engine(engine).exec();
+            String resMessage = resObj instanceof  String ? (String) resObj : JSON.toJSONString(resObj);
+            //resMessage = resMessage.length() <= (10 * 1024 * 1024) ? resMessage : resMessage.substring(0,10*1024*1024);
+            resp.setMsg(resMessage);//限制返回值10M
         }catch (Exception e){
             result = "failure";
             error = ExceptionUtils.getFullStackTrace( e );
