@@ -1,18 +1,11 @@
 package com.bsi.utils;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.bsi.framework.core.utils.MathUtils;
 import com.bsi.md.agent.datasource.AgDatasourceContainer;
 import com.bsi.md.agent.datasource.AgKafkaTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.TopicPartition;
 
-import java.time.Duration;
-import java.util.Arrays;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -31,7 +24,7 @@ public class KafkaUtils {
         properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
         properties.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
-        properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG,1000); //一次最多处理100条
+        properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG,1000); //一次最多处理1000条
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         return new KafkaConsumer<>(properties);
