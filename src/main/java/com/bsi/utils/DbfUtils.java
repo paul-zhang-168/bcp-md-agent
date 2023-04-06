@@ -24,7 +24,7 @@ public class DbfUtils {
      * @return  List<Map<String, Object>>
      * @throws SQLException
      */
-    public static List<Map<String, Object>> readDbf(String path,String sql)  {
+    public static List<Map<String, Object>> readDbf(String path,String sql,int skip)  {
         List<Map<String, Object>> data = new ArrayList<>();
         String url = "jdbc:dbf:" + path;
         Connection conn = null;
@@ -35,10 +35,16 @@ public class DbfUtils {
             conn = DriverManager.getConnection(url);
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
+            int rowNum = 0;
             ResultSetMetaData metaData = rs.getMetaData();
             int columnCount = metaData.getColumnCount();
             while (rs.next()) {
+                rowNum++;
+                if(rowNum<=skip){
+                    continue;
+                }
                 Map<String, Object> row = new HashMap<>();
+                row.put("DBF_ROW_NO",rowNum);
                 for (int i = 1; i <= columnCount; i++) {
                     String columnName = metaData.getColumnName(i);
                     Object value = rs.getString(i);
@@ -47,6 +53,7 @@ public class DbfUtils {
                 data.add(row);
             }
         }catch (Exception e){
+            e.printStackTrace();
             info_log.info("读取dbf文件报错,错误信息:{}", ExceptionUtils.getFullStackTrace(e));
         } finally {
             if (rs != null) {

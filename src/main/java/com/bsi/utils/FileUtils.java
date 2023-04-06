@@ -59,10 +59,7 @@ public class FileUtils {
      * @return
      */
     public static List<String> getNewOrModifiedFiles(String path, Long lastTs,Long maxSize,String[] exts) {
-        info_log.info("path:{},lastTs:{},maxSize:{},exts:{}",path,lastTs,maxSize,JSONUtils.toJson(exts));
         File directory  = new File(path);
-        info_log.info("file:{},exits:{},dir:{}",directory.getAbsoluteFile(),directory.exists(),directory.isDirectory());
-        info_log.info("list:{}",directory.listFiles().length);
         return Arrays.stream(directory.listFiles())
                 .filter(file -> file.isFile() && Arrays.binarySearch(exts,getFileExtension(file))>=0 && file.length() <= maxSize)
                 .filter(file -> file.lastModified() > lastTs)
