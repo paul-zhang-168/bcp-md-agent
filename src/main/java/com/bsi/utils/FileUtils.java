@@ -2,6 +2,8 @@ package com.bsi.utils;
 
 import com.bsi.framework.core.utils.ExceptionUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class FileUtils {
+    private static Logger info_log = LoggerFactory.getLogger("TASK_INFO_LOG");
 
     /**
      * 读取文件内容
@@ -56,7 +59,10 @@ public class FileUtils {
      * @return
      */
     public static List<String> getNewOrModifiedFiles(String path, Long lastTs,Long maxSize,String[] exts) {
+        info_log.info("path:{},lastTs:{},maxSize:{},exts:{}",path,lastTs,maxSize,JSONUtils.toJson(exts));
         File directory  = new File(path);
+        info_log.info("file:{},exits:{},dir:{}",directory.getAbsoluteFile(),directory.exists(),directory.isDirectory());
+        info_log.info("list:{}",directory.listFiles().length);
         return Arrays.stream(directory.listFiles())
                 .filter(file -> file.isFile() && Arrays.binarySearch(exts,getFileExtension(file))>=0 && file.length() <= maxSize)
                 .filter(file -> file.lastModified() > lastTs)
