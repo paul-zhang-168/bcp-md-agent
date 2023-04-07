@@ -146,12 +146,12 @@
             <version>1.68</version>
         </dependency>
 
+        <!-- dbf文件读取 -->
         <dependency>
-            <groupId>com.bsi</groupId>
-            <artifactId>dbf</artifactId>
-            <version>1.0.0</version>
+            <groupId>com.github.albfernandez</groupId>
+            <artifactId>javadbf</artifactId>
+            <version>1.13.1</version>
         </dependency>
-
     </dependencies>
 
 
