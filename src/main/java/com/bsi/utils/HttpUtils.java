@@ -1,11 +1,7 @@
 package com.bsi.utils;
 
 import com.bsi.framework.core.httpclient.builder.HCB;
-import com.bsi.framework.core.httpclient.common.HttpConfig;
-import com.bsi.framework.core.httpclient.common.HttpHeader;
-import com.bsi.framework.core.httpclient.common.HttpMethods;
-import com.bsi.framework.core.httpclient.common.HttpResult;
-import com.bsi.framework.core.httpclient.common.SSLs;
+import com.bsi.framework.core.httpclient.common.*;
 import com.bsi.framework.core.httpclient.utils.HttpClientUtil;
 import com.bsi.framework.core.utils.ExceptionUtils;
 import com.bsi.framework.core.utils.RequestUtils;
@@ -13,7 +9,7 @@ import com.bsi.md.agent.entity.dto.AgHttpResult;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.slf4j.Logger;
@@ -28,9 +24,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.ByteArrayOutputStream;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -95,7 +88,7 @@ public class HttpUtils {
         client.setRequestFactory(new HttpComponentsClientHttpRequestFactory(
                 HttpClientBuilder.create()
                         .setSSLContext(SSLContextBuilder.create()
-                                .loadTrustMaterial(new TrustSelfSignedStrategy())
+                                .loadTrustMaterial(new TrustAllStrategy())
                                 .build())
                         .setSSLHostnameVerifier(new NoopHostnameVerifier())
                         .build()));
