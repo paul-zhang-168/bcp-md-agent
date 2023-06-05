@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.NumberFormat;
@@ -14,7 +15,12 @@ import java.util.List;
 
 public class ExcelUtil {
     private static Logger info_log = LoggerFactory.getLogger("TASK_INFO_LOG");
+    private static NumberFormat numberFormat;
 
+    static {
+        numberFormat = NumberFormat.getNumberInstance();
+        numberFormat.setGroupingUsed(false);
+    }
     public static List<List<JSONObject>> readData(String filepath) {
         List<List<JSONObject>> sheetList = new ArrayList<>();
         try {
@@ -26,9 +32,6 @@ public class ExcelUtil {
 
             // 创建一个工作簿对象，表示整个Excel文件
             Workbook workbook = WorkbookFactory.create(inputStream);
-
-            NumberFormat numberFormat = NumberFormat.getNumberInstance();
-            numberFormat.setGroupingUsed(false);
 
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
