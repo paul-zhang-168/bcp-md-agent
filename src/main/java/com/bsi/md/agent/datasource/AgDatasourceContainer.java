@@ -1,6 +1,7 @@
 package com.bsi.md.agent.datasource;
 
 import com.alibaba.fastjson.JSONObject;
+import org.eclipse.paho.client.mqttv3.MqttClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +18,7 @@ public class AgDatasourceContainer {
     private static Map<String, JSONObject> propertiesMap = new HashMap<>();
     private static Map<String, AgKafkaTemplate> kafkaMap = new HashMap<>();
     private static Map<String, AgPulsarTemplate> pulsarMap = new HashMap<>();
+    private static Map<String, AgMqttTemplate> mqttMap = new HashMap<>();
 
     /**
      * 获取数据源属性
@@ -83,6 +85,13 @@ public class AgDatasourceContainer {
         pulsarMap.clear();
     }
     /**
+     * 清空mqtt数据源map
+     */
+    public static void clearMqttDataSource(){
+        mqttMap.values().forEach(AgMqttTemplate::close);
+        mqttMap.clear();
+    }
+    /**
      * 添加一个jdbc数据源
      * @param key
      * @param template
@@ -110,6 +119,7 @@ public class AgDatasourceContainer {
         clearSapRfcDataSource();
         clearKafkaDataSource();
         clearPulsarDataSource();
+        clearMqttDataSource();
         propertiesMap.clear();
     }
 
@@ -179,6 +189,14 @@ public class AgDatasourceContainer {
     public static void addPulsarDataSource(String key,AgPulsarTemplate template){
         pulsarMap.put(key,template);
     }
+    /**
+     * 添加一个mqtt数据源
+     * @param key
+     * @param template
+     */
+    public static void addMqttDataSource(String key,AgMqttTemplate template){
+        mqttMap.put(key,template);
+    }
 
     /**
      * 获取sapRFC数据源
@@ -187,5 +205,14 @@ public class AgDatasourceContainer {
      */
     public static AgSapRFCTemplate getSapRfcDataSource(String key){
         return sapRfcMap.get(key);
+    }
+
+    /**
+     * 获取mqtt数据源
+     * @param key
+     * @return
+     */
+    public static AgMqttTemplate getMqttDataSource(String key){
+        return mqttMap.get(key);
     }
 }

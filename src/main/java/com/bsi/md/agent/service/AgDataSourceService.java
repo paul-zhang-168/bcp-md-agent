@@ -8,13 +8,7 @@ import com.bsi.framework.core.utils.EHCacheUtil;
 import com.bsi.framework.core.utils.ExceptionUtils;
 import com.bsi.framework.core.utils.StringUtils;
 import com.bsi.md.agent.constant.AgConstant;
-import com.bsi.md.agent.datasource.AgApiTemplate;
-import com.bsi.md.agent.datasource.AgApiUpTemplate;
-import com.bsi.md.agent.datasource.AgDatasourceContainer;
-import com.bsi.md.agent.datasource.AgJdbcTemplate;
-import com.bsi.md.agent.datasource.AgKafkaTemplate;
-import com.bsi.md.agent.datasource.AgPulsarTemplate;
-import com.bsi.md.agent.datasource.AgSapRFCTemplate;
+import com.bsi.md.agent.datasource.*;
 import com.bsi.md.agent.entity.AgDataSource;
 import com.bsi.md.agent.entity.dto.AgDataSourceDto;
 import com.bsi.md.agent.ot.AgDcDriver;
@@ -139,6 +133,9 @@ public class AgDataSourceService extends FwService {
                         }else if("pulsar".equals( ds.getClassify() )){
                             AgPulsarTemplate pulsarTemplate = new AgPulsarTemplate(config.getString("servers"),config.getString("groupId"),map);
                             AgDatasourceContainer.addPulsarDataSource(ds.getId(),pulsarTemplate);
+                        }else if("mqtt".equals( ds.getClassify() )){
+                            AgMqttTemplate mqttTemplate = new AgMqttTemplate(config.getString("servers"),config.getString("groupId"),map);
+                            AgDatasourceContainer.addMqttDataSource(ds.getId(),mqttTemplate);
                         }
                     }
                 }
