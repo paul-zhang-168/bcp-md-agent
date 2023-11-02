@@ -16,6 +16,7 @@ public class SocketUtils {
     public static SocketClient getClient(String key,String ip,int port){
         SocketClient client = clientMap.get(key);
         if(client==null){
+            info_log.info("client对象不存在,创建新的client对象");
             client = new SocketClient();
             try {
                 client.connect(ip,port);
