@@ -17,19 +17,17 @@ public class SocketUtils {
 
     public static SocketClient getClient(String key,String ip,int port){
         info_log.info("key:{},ip:{},port:{}",key,ip,port);
-        log.info("key:{},ip:{},port:{}",key,ip,port);
         SocketClient client = clientMap.get(key);
-        info_log.info("client:{}",client);
         log.info("client:{}",client);
         if(client==null){
             info_log.info("client对象不存在,创建新的client对象");
             client = new SocketClient();
             try {
                 client.connect(ip,port);
-            }catch (Exception e){
+                clientMap.put(key,client);
+            }catch (Exception e) {
                 info_log.error("连接socket服务报错:{}", ExceptionUtils.getFullStackTrace(e));
             }
-            clientMap.put(key,client);
         }
         return client;
     }

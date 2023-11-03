@@ -25,9 +25,7 @@ public class SocketClient {
         socket = new Socket(host, port);
         info_log.info("socket连接状态:{}",socket.isConnected());
         writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        info_log.info("writer:{}",writer);
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        info_log.info("reader:{}",reader);
     }
   
     public void sendMessage(String message) throws Exception {
