@@ -11,6 +11,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,6 +34,7 @@ public class EncryptUtils {
 	private static final String ALGORITHM_AES = "AES";
 	private static final String ALGORITHM_RSA = "RSA";
 	private static final String ALGORITHM_AES_GCM_NP = "AES/GCM/NoPadding";
+	private static final String ALGORITHM_AES_CBC_PKCS5 = "AES/CBC/PKCS5Padding";
 	public static String encrypt(String type,String key, String data, Map<String,String> config) throws Exception {
 		if (type == null)return null;
 		String value = "";
@@ -46,6 +48,9 @@ public class EncryptUtils {
 				break;
 			case ALGORITHM_AES_GCM_NP :
 				value = encrypt_AES_GCM_NP(key,data,config.get("iv"));
+				break;
+			case ALGORITHM_AES_CBC_PKCS5 :
+				value = encrypt_AES_CBC_PKCS5(key,data,config.get("iv"));
 				break;
 			default:
 				log.warn("not found encrypt type, type:{}",type);
@@ -64,12 +69,27 @@ public class EncryptUtils {
 			iv = IVStr.getBytes();
 		}
 		Cipher cipher = Cipher.getInstance(ALGORITHM_AES_GCM_NP);;
-		SecretKeySpec key = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "AES");// secretKey 是同步参数配置的加密秘钥
+		SecretKeySpec key = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), ALGORITHM_AES);// secretKey 是同步参数配置的加密秘钥
 		GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(128,iv);
 		cipher.init(Cipher.ENCRYPT_MODE, key, gcmParameterSpec);
 		byte[] bytes = cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
 		// 字符串转码后即为加密后的内容
 		return Base64.getEncoder().encodeToString(bytes);
+	}
+
+	public static String encrypt_AES_CBC_PKCS5(String secretKey,String data,String IVStr) throws Exception {
+		//将AES密销转换为SecretKeySpec对象
+		SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(),ALGORITHM_AES);
+		//将AES初始化向量转换为IvParameterSpec对象
+		IvParameterSpec ivParameterSpec = new IvParameterSpec(IVStr.getBytes());
+		//根据加密算法获取加密器
+		Cipher cipher = Cipher.getInstance(ALGORITHM_AES_CBC_PKCS5);
+		//初始化加密器，设置加密模式、密钥和初始化向量
+		cipher.init(Cipher.ENCRYPT_MODE,secretKeySpec,ivParameterSpec);
+		//加密数据
+		byte[] encryptedData = cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
+		//对加密后的数据使用Base64编码
+		return Base64.getEncoder().encodeToString(encryptedData);
 	}
 
 	/**
