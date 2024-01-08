@@ -359,6 +359,7 @@ public class AgConfigController {
             context.put("outputConfig",config.getOutputNode());
             context.put("transformConfig",config.getTransformNode());
             context.put("taskInfoLog",agTaskLog);
+            context.put("ctx_task_id",param.getTaskId());
             Object resObj = AgTaskBootStrap.custom().context(context).engine(engine).exec();
             String resMessage = resObj instanceof  String ? (String) resObj : JSON.toJSONString(resObj);
             //resMessage = resMessage.length() <= (10 * 1024 * 1024) ? resMessage : resMessage.substring(0,10*1024*1024);
