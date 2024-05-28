@@ -118,11 +118,12 @@ public class SocketServer {
         try {
             out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            String key = clientSocket.getInetAddress().getHostAddress()+":"+clientSocket.getPort();
             while (true) {
                 String line = in.readLine();
                 if(line!=null && line.length()>30){
                     msgList.offer(line);
-                    msgMap.put(clientSocket.getInetAddress().getHostAddress()+":"+clientSocket.getPort(),msgList);
+                    msgMap.put(key,msgList);
                     if(callback) {
                         String strDate =DateUtils.nowDate("yyyyMMddhhmmss");
                         StringBuilder callBackMsg = new StringBuilder();
@@ -134,7 +135,7 @@ public class SocketServer {
                     }
                 }else{
                     if(line!=null) {
-                        info_log.info("line:{}", line);
+                        info_log.info("客户端:{},msg:{}",key, line);
                     }
                 }
             }
