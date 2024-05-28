@@ -36,12 +36,11 @@ public class SocketClient {
   
     public String receiveMessage() throws Exception {
         StringBuilder response = new StringBuilder();
-        info_log.info("reader:{}",reader);
         String line = reader.readLine();
         response.append(line);
-        return response.toString();  
-    }  
-  
+        return response.toString();
+    }
+
     public void disconnect() {
         IOUtils.closeQuietly(writer);
         IOUtils.closeQuietly(reader);

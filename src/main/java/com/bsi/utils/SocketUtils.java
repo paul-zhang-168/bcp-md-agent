@@ -14,11 +14,19 @@ import java.util.HashMap;
 public class SocketUtils {
     private static Logger info_log = LoggerFactory.getLogger("TASK_INFO_LOG");
     private static HashMap<String,SocketClient> clientMap = new HashMap<>();
+    private static HashMap<String,SocketServer> serverMap = new HashMap<>();
 
+    /**
+     * 生产socket客户端
+     * @param key
+     * @param ip
+     * @param port
+     * @return
+     */
     public static SocketClient getClient(String key,String ip,int port){
         info_log.info("key:{},ip:{},port:{}",key,ip,port);
         SocketClient client = clientMap.get(key);
-        log.info("client:{}",client);
+        info_log.info("client:{}",client);
         if(client==null){
             info_log.info("client对象不存在,创建新的client对象");
             client = new SocketClient();
@@ -30,5 +38,40 @@ public class SocketUtils {
             }
         }
         return client;
+    }
+
+    /**
+     * 生产socket客户端
+     * @param key
+     * @param port
+     * @return
+     */
+    public static SocketServer createServer(String key,int port,int maxClient,boolean callBack){
+        info_log.info("key:{},port:{}",key,port);
+        SocketServer server = serverMap.get(key);
+        info_log.info("server:{}",server);
+        if(server==null){
+            info_log.info("server对象不存在,创建新的server对象");
+            server = new SocketServer();
+            try {
+                serverMap.put(key,server);
+                server.start(port,maxClient,callBack);
+            }catch (Exception e) {
+                info_log.error("连接socket服务报错:{}", ExceptionUtils.getFullStackTrace(e));
+            }
+        }
+        return server;
+    }
+
+    /**
+     * 生产socket客户端
+     * @param key
+     * @return
+     */
+    public static SocketServer getServer(String key){
+        info_log.info("key:{}",key);
+        SocketServer server = serverMap.get(key);
+        info_log.info("server:{}",server);
+        return server;
     }
 }
