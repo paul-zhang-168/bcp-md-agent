@@ -46,7 +46,7 @@ public class SocketUtils {
      * @param port
      * @return
      */
-    public static SocketServer createServer(String key,int port,int maxClient,boolean callBack){
+    public static SocketServer createServer(String key,int port,int maxClient,String serverNo,String clientNo,boolean callBack){
         info_log.info("key:{},port:{}",key,port);
         SocketServer server = serverMap.get(key);
         info_log.info("server:{}",server);
@@ -55,7 +55,7 @@ public class SocketUtils {
             server = new SocketServer();
             try {
                 serverMap.put(key,server);
-                server.start(port,maxClient,callBack);
+                server.start(port,maxClient,callBack,serverNo,clientNo);
             }catch (Exception e) {
                 info_log.error("连接socket服务报错:{}", ExceptionUtils.getFullStackTrace(e));
             }

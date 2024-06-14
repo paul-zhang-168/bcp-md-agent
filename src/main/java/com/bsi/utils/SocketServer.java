@@ -26,7 +26,7 @@ public class SocketServer {
     Map<String, LinkedList<String>> msgMap = new HashMap<>();
     private static Logger info_log = LoggerFactory.getLogger("TASK_INFO_LOG");
 
-    public void start(int port,int maxClient,boolean callBack) throws Exception {
+    public void start(int port,int maxClient,boolean callBack,String serverNo,String clientNo) throws Exception {
         info_log.info("开始启动socket服务端,内网IP:{}，外网IP:{},端口号:{}", IpUtils.INTRANET_IP,IpUtils.INTERNET_IP,port);
         serverSocket = new ServerSocket(port);
         executor = createThreadPool(maxClient,port);
@@ -39,7 +39,7 @@ public class SocketServer {
                 info_log.info("count:{},maxClient:{}",count,maxClient);
                 if(maxClient>=count){
                     // 尝试提交客户端处理任务到线程池
-                    executor.execute(() -> handleClient(clientSocket,callBack));
+                    executor.execute(() -> handleClient(clientSocket,callBack,serverNo,clientNo));
                     info_log.info("已接入第{}个客户端",count);
                 }else{
                     info_log.info("只允许{}个客户端连接",maxClient);
@@ -111,7 +111,7 @@ public class SocketServer {
         }
     }
 
-    private void handleClient(Socket clientSocket,boolean callback) {
+    private void handleClient(Socket clientSocket,boolean callback,String serverNo,String clientNo) {
         LinkedList<String> msgList = new LinkedList<>();
         BufferedWriter out = null;
         BufferedReader in = null;
@@ -128,7 +128,7 @@ public class SocketServer {
                         String strDate =DateUtils.nowDate("yyyyMMddhhmmss");
                         StringBuilder callBackMsg = new StringBuilder();
                         callBackMsg.append("0100").append(line.substring(4,10)).append(strDate.substring(0,8));
-                        callBackMsg.append(strDate.substring(8,14)).append("EF").append("PB").append("A").append(space80());
+                        callBackMsg.append(strDate.substring(8,14)).append(clientNo).append(serverNo).append("A").append(space80());
                         callBackMsg.append(hexToString("0a"));
                         out.write(callBackMsg.toString());
                         out.flush();
