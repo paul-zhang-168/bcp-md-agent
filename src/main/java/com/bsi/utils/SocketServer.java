@@ -115,11 +115,16 @@ public class SocketServer {
         LinkedList<String> msgList = new LinkedList<>();
         BufferedWriter out = null;
         BufferedReader in = null;
+        String key = clientSocket.getInetAddress().getHostAddress()+":"+clientSocket.getPort();
         try {
+            clientSocket.setSoTimeout(120000); // 设置超时为 2分钟
             out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            String key = clientSocket.getInetAddress().getHostAddress()+":"+clientSocket.getPort();
             while (true) {
+                if ( clientSocket.isClosed() || clientSocket.isInputShutdown() ) {
+                    info_log.info("客户端{}已经断开连接",key);
+                    break; // 客户端断开或线程中断
+                }
                 String line = in.readLine();
                 if(line!=null && line.length()>30){
                     msgList.offer(line);
@@ -139,22 +144,21 @@ public class SocketServer {
                     }
                 }
             }
-        } catch (IOException e) {
-            info_log.error("客户端处理异常：{}，关闭",ExceptionUtils.getFullStackTrace(e));
+        } catch (Exception e) {
+            info_log.info("客户端处理异常：{}，关闭",ExceptionUtils.getFullStackTrace(e));
         } finally {
             try {
+                info_log.info("开始关闭客户端{}的资源",key);
                 if (in != null) in.close();
                 if (out != null) out.close();
                 clientSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+                info_log.info("资源关闭完毕");
+            } catch (Exception e) {
+                info_log.info("资源关闭异常：{}",ExceptionUtils.getFullStackTrace(e));
             }
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println(":"+hexToString("0a")+":");
-    }
     private static String stringToHex(String inputStr) {
         StringBuilder hexBuilder = new StringBuilder();
         for (char ch : inputStr.toCharArray()) {
