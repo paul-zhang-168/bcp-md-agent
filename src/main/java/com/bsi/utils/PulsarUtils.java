@@ -4,6 +4,7 @@ import com.bsi.framework.core.utils.StringUtils;
 import com.bsi.md.agent.datasource.AgDatasourceContainer;
 import com.bsi.md.agent.datasource.AgPulsarTemplate;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pulsar.client.api.MessageId;
 import org.apache.pulsar.client.impl.MessageIdImpl;
 
 @Slf4j
@@ -52,5 +53,15 @@ public class PulsarUtils {
         String[] arr = StringUtils.split(msgId,":");
         MessageIdImpl idImpl = new MessageIdImpl(Long.parseLong(arr[0]),Long.parseLong(arr[1]),Integer.parseInt(arr[2]));
         template.commit(dataSourceId+"-"+taskId,idImpl);
+    }
+
+    /**
+     * 确认消费
+     * @param dataSourceId
+     * @param taskId
+     * @param msgId
+     */
+    public static void commitMsg(String dataSourceId, String taskId, MessageId msgId){
+        AgDatasourceContainer.getPulsarDataSource(dataSourceId).commit(dataSourceId+"-"+taskId,msgId);
     }
 }

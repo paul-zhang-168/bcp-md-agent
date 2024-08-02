@@ -1,6 +1,5 @@
 package com.bsi.md.agent.datasource;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.bsi.md.agent.pulsar.PulsarClientSimulator;
 import com.bsi.md.agent.pulsar.PulsarConsumerSimulator;
@@ -12,7 +11,9 @@ import org.apache.pulsar.client.api.Messages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -88,20 +89,21 @@ public class AgPulsarTemplate implements AgDataSourceTemplate{
      */
     public Object pollMany(String key,String topic,int receiverQueueSize,int maxNumMessages,int maxNumBytes,int pullTimeout,int ackTimeout){
         PulsarConsumerSimulator consumer = consumerMap.get(key);
-        if(consumer==null){
-            consumer = getBathConsumer(topic,receiverQueueSize,maxNumMessages,maxNumBytes,pullTimeout,ackTimeout);
-            consumerMap.put(key,consumer);
+        if(consumer==null) {
+            consumer = getBathConsumer(topic, receiverQueueSize, maxNumMessages, maxNumBytes, pullTimeout, ackTimeout);
+            consumerMap.put(key, consumer);
         }
+
         Messages<byte[]> msgList= consumer.batchReceive();
-        JSONArray list = new JSONArray();
+        List<JSONObject> list = new ArrayList<>();
         msgList.forEach(msg->{
             JSONObject obj = new JSONObject();
             obj.put("key",msg.getKey());
-            obj.put("msgId",msg.getMessageId().toString());
+            obj.put("msgId",msg.getMessageId());
             obj.put("value",new String(msg.getValue()));
             list.add(obj);
         });
-        return list.toJSONString();
+        return list;
     }
 
     /**
@@ -129,6 +131,7 @@ public class AgPulsarTemplate implements AgDataSourceTemplate{
         if(consumer==null){
             return false;
         }
+
         consumer.acknowledge(msgId);
         return true;
     }
