@@ -130,9 +130,9 @@ public class SimpleSocketServer {
     }
 
     class ClientHandler implements Runnable {
-        private LinkedList<String> msgList = new LinkedList<>();
+        private final LinkedList<String> msgList = new LinkedList<>();
         private BufferedWriter out = null;
-        private InputStream in = null;
+        private BufferedReader in = null;
         private Socket clientSocket;
         public ClientHandler(Socket clientSocket) {
             this.clientSocket = clientSocket;
@@ -141,27 +141,16 @@ public class SimpleSocketServer {
             String key = clientSocket.getInetAddress().getHostAddress()+":"+clientSocket.getPort();
             try {
                 out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-                in = clientSocket.getInputStream();
-                byte[] buffer = new byte[1024];
-                ByteArrayOutputStream message = new ByteArrayOutputStream();
+                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));
+
                 while (true) {
-                    int bytesRead = in.read(buffer);
-                    info_log.info("b:{}",bytesRead);
-                    if ( bytesRead == -1 ) {
+                    String line = in.readLine();
+                    if ( line==null ) {
                         //如果客户端直接断开连接，这个时候readLine()会返回null导致死循环，cpu占用率100%，所以读取到null要直接断开连接并关闭资源
                         info_log.info("客户端{}已经断开连接",key);
                         break;
                     }
-                    for (int i = 0; i < bytesRead; i++) {
-                        byte b = buffer[i];
-                        if (b == MGS_DELIMITER_0a) {
-                            // 处理完整的消息
-                            handleMessage(message.toByteArray(),key);
-                            message.reset();
-                        } else {
-                            message.write(b);
-                        }
-                    }
+                    handleMessage(line,key);
                 }
             } catch (Exception e) {
                 info_log.info("客户端处理异常：{}，关闭",ExceptionUtils.getFullStackTrace(e));
@@ -184,9 +173,8 @@ public class SimpleSocketServer {
             }
         }
 
-        private void handleMessage(byte[] message,String key) throws IOException {
-            String line = new String(message, StandardCharsets.UTF_8);
-            msgList.offer(line);
+        private void handleMessage(String message,String key) throws IOException {
+            msgList.offer(message);
             msgMap.put(key,msgList);
         }
     }
