@@ -119,6 +119,13 @@
             <version>1.0.0</version>
         </dependency>
 
+        <!-- 系统资源统计 -->
+        <dependency>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
+            <version>6.6.5</version>
+        </dependency>
+
         <dependency>
             <groupId>net.sf.ucanaccess</groupId>
             <artifactId>ucanaccess</artifactId>
