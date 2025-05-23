@@ -11,9 +11,7 @@ import oshi.util.Util;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class AgSystemInfoUtil {
 
@@ -35,7 +33,7 @@ public class AgSystemInfoUtil {
         result.putAll(getMemoryInfo(hardware.getMemory()));
 
         // Disk
-        result.put("disks", getDiskInfo(os.getFileSystem()));
+        result.putAll(getDiskInfo(os.getFileSystem()));
 
         return result;
     }
@@ -74,9 +72,9 @@ public class AgSystemInfoUtil {
         return memInfo;
     }
 
-    private static List<Map<String, Object>> getDiskInfo(FileSystem fileSystem) {
+    private static Map<String, Object> getDiskInfo(FileSystem fileSystem) {
 
-        return fileSystem.getFileStores().stream().map(fs -> {
+        return fileSystem.getFileStores().stream().filter(d->"/".equals(d.getMount())).findFirst().map(fs -> {
             Map<String, Object> disk = new HashMap<>();
             long total = fs.getTotalSpace();
             long used = total - fs.getUsableSpace();
@@ -88,7 +86,7 @@ public class AgSystemInfoUtil {
             disk.put("SYSTEM_DISK_FREE", df.format(fs.getUsableSpace() / (1000.0 * 1000 * 1000)));
             disk.put("SYSTEM_DISK_USAGE_PERCENT", df.format(100d * used / total));
             return disk;
-        }).collect(Collectors.toList());
+        }).orElse(new HashMap<>());
     }
 
     public static void main(String[] args) {
