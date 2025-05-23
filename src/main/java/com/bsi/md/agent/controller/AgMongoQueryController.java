@@ -35,4 +35,9 @@ public class AgMongoQueryController {
     public Map<String, Object> getSystemInfo() {
         return AgSystemInfoUtil.getSystemInfo();
     }
+
+    @PostMapping("/task/stats")
+    public Map<String, Object> getStats(@RequestBody JSONObject params) {
+        return MongoDBUtils.getStats(params);
+    }
 }
