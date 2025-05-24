@@ -4,9 +4,7 @@ import com.bsi.framework.core.utils.EHCacheUtil;
 import com.bsi.framework.core.utils.StringUtils;
 import com.bsi.md.agent.constant.AgConstant;
 import com.bsi.md.agent.engine.plugins.AgAfterOutputPluginManager;
-import com.bsi.md.agent.engine.plugins.AgTaskErrorDataWarnPlugin;
 import com.bsi.md.agent.log.AgTaskLog;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,18 +59,22 @@ public class AgTaskBootStrap {
         //上次运行成功的毫秒数
         String lastTs = (String) EHCacheUtil.getValue("task_last_success_time",context.getTaskId());
         info_log.info("lastTs:{}",lastTs);
+        info_log.info("engine:"+engine);
         //如果任务是第一次运行，则设置上次成功运行的时间为当前时间
         if( !apiFlag && !repairFlag && StringUtils.isNullOrBlank(lastTs) ){
             EHCacheUtil.setValue("task_last_success_time",context.getTaskId(),ts,true);
         }
+        info_log.info("context:"+context);
         context.put("ctx_task_last_success_ts", StringUtils.hasText(lastTs)?lastTs:ts);
         Object obj = engine.input(context);
+        info_log.info("inputover:"+obj);
         context.put(AgConstant.AG_DATA,obj);
+
         if(obj==null && !apiFlag){
             info_log.info("输入节点未查询到数据，结束任务");
             return null;
         }
-        info_log.debug("2.执行转换节点");
+        info_log.info("2.执行转换节点");
         obj = engine.transform(context);
         context.put(AgConstant.AG_DATA,obj);
         info_log.debug("3.执行输出节点");
