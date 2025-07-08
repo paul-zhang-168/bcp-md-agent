@@ -8,6 +8,9 @@ import com.bsi.utils.HttpUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Map;
 
 /**
@@ -28,11 +31,13 @@ public class AgMqttTemplate implements AgDataSourceTemplate{
     //其他参数
     private Map<String,String> otherParams;
 
+    private static Logger info_log = LoggerFactory.getLogger("TASK_INFO_LOG");
 
     public AgMqttTemplate(String servers, String groupId, Map<String,String> otherParams){
         this.servers = servers;
         this.groupId = groupId;
         this.otherParams = otherParams;
+
         //异步初始化，否则影响程序运行
         AgExecutorService.getExecutor().submit(() -> {
             this.mqttClient = getClient();
@@ -79,7 +84,7 @@ public class AgMqttTemplate implements AgDataSourceTemplate{
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
                     // 消息发布完成
-                    log.error("msg send success ...");
+                    log.info("msg send success ...");
                 }
             });
         }catch (Exception e){
@@ -99,6 +104,25 @@ public class AgMqttTemplate implements AgDataSourceTemplate{
                 this.mqttClient.close(true);
                 this.mqttClient = null;
             }catch (Exception e) {}
+        }
+    }
+
+    /**
+     * 发送消息到MQTT Broker
+     *
+     * @param topic   主题
+     * @param payload 消息内容
+     * @param qos     QoS等级（0:最多一次, 1:至少一次, 2:恰好一次）
+     */
+    public void publish(String topic, String payload, int qos) {
+        if (this.mqttClient == null || !this.mqttClient.isConnected()) {
+            info_log.error("MQTT未连接，topic: {}", topic);
+            return;
+        }
+        try {
+            this.mqttClient.publish(topic, payload.getBytes(), qos, false);
+        } catch (MqttException e) {
+            info_log.error("发送消息到topic: {}. 错误: {}", topic, ExceptionUtils.getFullStackTrace(e));
         }
     }
 }
