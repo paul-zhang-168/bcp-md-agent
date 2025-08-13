@@ -5,6 +5,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.bsi.md.agent.config.MongoConfigProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
@@ -27,6 +28,7 @@ import java.util.List;
 @EnableJpaRepositories("com.bsi.**.repository")
 @ComponentScan("com.bsi.**")
 @EnableScheduling
+@Slf4j
 public class AgApplication {
 
     /**
@@ -59,8 +61,8 @@ public class AgApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(AgApplication.class, args);
-        System.out.println("程序启动完毕。。。。。");
-        System.out.println("是否启用mongodb："+MongoConfigProperties.isEnabled());
+        log.info("程序启动完毕。。。。。");
+        log.info("是否启用mongodb：{}",MongoConfigProperties.isEnabled());
     }
 
 }
