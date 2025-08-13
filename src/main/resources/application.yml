@@ -36,3 +36,6 @@ spring:
     show-sql: true
     thymeleaf:
       cache: false
+
+mongodb:
+  enabled: true
