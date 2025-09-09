@@ -52,7 +52,7 @@ public class SHA256Utils {
 	public static String generateSignature(String key, String body, String name)
 		throws InvalidKeyException, NoSuchAlgorithmException, IllegalStateException {
 		if(name == null){
-			name = "HamcSHA256";
+			name = "HmacSHA256";
 		}
 		return base_64(hMac(key, body, name));
 	}
@@ -119,5 +119,54 @@ public class SHA256Utils {
 	}
 	public static byte[] toBytes(String str,String charset){
 		return StringUtils.isEmpty(charset) ? str.getBytes():str.getBytes(Charset.forName(charset));
+	}
+
+	/**
+	 * 将加密后的字节数组转换成字符串
+	 *
+	 * @param b 字节数组
+	 * @return 字符串
+	 */
+	public static String byteArrayToHexString(byte[] b) {
+		StringBuilder hs = new StringBuilder();
+		String stmp;
+		for (int n = 0; b != null && n < b.length; n++) {
+			stmp = Integer.toHexString(b[n] & 0XFF);
+			if (stmp.length() == 1){
+				hs.append('0');
+			}
+			hs.append(stmp);
+		}
+		return hs.toString().toLowerCase();
+	}
+
+	/**
+	 * sha256_HMAC加密
+	 *
+	 * @param message 消息
+	 * @param secret 秘钥
+	 * @return 加密后字符串
+	 */
+	public static String hmacSHA256(String secret, String message) throws
+			Exception {
+		String hash = "";
+		Mac hmacSha256 = Mac.getInstance("HmacSHA256");
+		SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(),
+				"HmacSHA256");
+		hmacSha256.init(secretKey);
+		byte[] bytes = hmacSha256.doFinal(message.getBytes());
+		hash = byteArrayToHexString(bytes);
+		return hash;
+	}
+
+	public static String generateSignatureFl(String appId, String appSecret, String serialId, Long timestamp)
+			throws InvalidKeyException, NoSuchAlgorithmException, IllegalStateException {
+		String plaintext = appId + timestamp + serialId;
+		try {
+			return hmacSHA256(appSecret, plaintext);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
