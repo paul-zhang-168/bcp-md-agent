@@ -36,6 +36,6 @@ local: base
 arm: base
 	echo building "正在服务器打包${NAMESIT}测试镜像..."
 	echo building ${NAMESIT}:${TAG}
-	cp src/main/docker/Dockerfile .
+	cp src/main/docker/Dockerfile-arm ./Dockerfile
 	docker buildx build --platform linux/arm64 -t ${REGISTRY}/${ARMORG}/${NAMESIT}:${TAG} . --push
 	rm Dockerfile
