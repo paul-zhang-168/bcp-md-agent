@@ -66,4 +66,46 @@ public class ModbusUtils {
         // 返回发送状态
         return succ;
     }
+
+    /**
+     * 批量上报子设备数据
+     * @param msg 要上报的数据
+     * @return boolean 表示消息是否发送成功
+     */
+    public static boolean reportSubDevicesProperties(String msg){
+        boolean succ = true;
+        try {
+            // 解析消息中的服务列表
+            JSONArray devicesList = JSON.parseArray(msg);
+            // 准备存储设备服务信息的列表
+            List<DeviceService> devices = new LinkedList<>();
+
+            // 遍历服务列表，解析每个服务的详细信息
+            for (int i = 0; i < devicesList.size(); i++) {
+                JSONObject p = devicesList.getJSONObject(i);
+                JSONArray servicesList = p.getJSONArray("services");
+                // 准备存储服务数据的列表
+                List<ServiceData> services = new LinkedList<>();
+                for (int j = 0; j < servicesList.size(); j++) {
+                    JSONObject sData = servicesList.getJSONObject(j);
+                    ServiceData serviceData = new ServiceData(sData.getString("service_id"), sData.getJSONObject("properties"), ZonedDateTime.parse( sData.getString("event_time")));
+                    services.add(serviceData);
+                }
+                // 创建设备服务对象，关联设备ID和服务数据
+                DeviceService deviceService = new DeviceService(p.getString("device_id"), services);
+                devices.add(deviceService);
+            }
+            // 创建子设备属性报告对象，包含所有设备的服务信息
+            SubDevicesPropsReport report = new SubDevicesPropsReport(devices);
+            // 使用IoT Edge工具类获取客户端，并上报子设备属性
+            IoTEdgeUtil.getDriverClient().reportSubDevicesProperties(report);
+        } catch (Exception e) {
+            // 异常处理：设置发送失败标志
+            succ = false;
+            // 记录错误日志，输出异常堆栈信息
+            log.error("发送数据到iot报错,错误信息:{}", ExceptionUtils.getFullStackTrace(e));
+        }
+        // 返回发送状态
+        return succ;
+    }
 }
