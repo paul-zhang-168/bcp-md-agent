@@ -2,6 +2,7 @@ package com.bsi.md.agent.utils;
 
 
 import com.bsi.framework.core.utils.ExceptionUtils;
+import com.bsi.utils.HttpUtils;
 import com.bsi.utils.JSONUtils;
 import com.huaweicloud.sdk.iot.module.DriverClient;
 import com.huaweicloud.sdk.iot.module.GatewayCallback;
@@ -51,10 +52,18 @@ public class IoTEdgeUtil {
                 //设备设置属性时触发，用来反控
                 @Override
                 public IotResult onDevicePropertiesSet(String s, PropsSet propsSet) {
-                    log.info("s:{}",s);
-                    log.info("PropsSet:{}", JSONUtils.toJson(propsSet));
-                    //不支持
-                    return new IotResult(1, "not supported");
+                    ServiceData serviceData = propsSet.getServices().get(0);
+                    if( !"$config".equalsIgnoreCase( serviceData.getServiceId() ) ){
+                        // 收到消息
+                        try {
+                            String msg = JSONUtils.toJson(propsSet);
+                            log.info("device_prop_set msg:{}",msg);
+                            HttpUtils.post("http://127.0.0.1:8080/api/device_prop_set",null,msg);
+                        }catch (Exception e){
+                            log.error("device_prop_set error:{}",ExceptionUtils.getFullStackTrace(e));
+                        }
+                    }
+                    return new IotResult(0, "success");
                 }
 
                 @Override
