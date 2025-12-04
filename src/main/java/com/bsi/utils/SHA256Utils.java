@@ -1,7 +1,11 @@
 package com.bsi.utils;
 
+import com.bsi.framework.core.utils.ExceptionUtils;
 import com.bsi.framework.core.utils.StringUtils;
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.Charset;
@@ -12,6 +16,8 @@ import java.security.NoSuchAlgorithmException;
 
 public class SHA256Utils {
 
+	private static Logger info_log = LoggerFactory.getLogger("TASK_INFO_LOG");
+
 	public static String getSHA256(String str,String digest) {
 		MessageDigest messageDigest;
 		String encodestr = "";
@@ -20,7 +26,7 @@ public class SHA256Utils {
 			messageDigest.update(str.getBytes(StandardCharsets.UTF_8));
 			encodestr = byte2Hex(messageDigest.digest());
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+			info_log.info("getSHA256方法调用报错:{}", ExceptionUtils.getFullStackTrace(e));
 		}
 		return encodestr;
 	}
@@ -141,6 +147,28 @@ public class SHA256Utils {
 	}
 
 	/**
+	 * 飞书消息推送签名方法
+	 * @param secret
+	 * @param timestamp
+	 * @return
+	 */
+	public static String genSign(String secret, long timestamp) {
+		//把timestamp+"\n"+密钥当做签名字符串
+		String stringToSign = timestamp + "\n" + secret;
+		String rs = "";
+		//使用HmacSHA256算法计算签名
+		try{
+			Mac mac = Mac.getInstance("HmacSHA256");
+			mac.init(new SecretKeySpec(stringToSign.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+			byte[] signData = mac.doFinal(new byte[]{});
+			rs =  new String(Base64.encodeBase64(signData));
+		}catch (Exception e){
+			info_log.info("飞书签名方法调用失败，失败信息:{}", ExceptionUtils.getFullStackTrace(e));
+		}
+		return rs;
+	}
+
+	/**
 	 * sha256_HMAC加密
 	 *
 	 * @param message 消息
@@ -165,7 +193,7 @@ public class SHA256Utils {
 		try {
 			return hmacSHA256(appSecret, plaintext);
 		} catch (Exception e) {
-			e.printStackTrace();
+			info_log.info("理想签名方法调用失败，失败信息:{}", ExceptionUtils.getFullStackTrace(e));
 		}
 		return null;
 	}
