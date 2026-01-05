@@ -1,6 +1,7 @@
 REGISTRY=swr.cn-north-4.myhuaweicloud.com
 PRODORG=prod-bcp-x86
 TESTORG=prod-bcp-x86
+ARMORG=prod-bcp-arm
 NAME=bcp-agent
 NAMESIT=bcp-agent
 TAG=$(shell date +%Y%m%d%H%M)
@@ -30,4 +31,11 @@ local: base
 	echo building "正在本地打包${NAME}镜像..."
 	cp src/main/docker/Dockerfile .
 	docker build -t ${NAME}:beta .
+	rm Dockerfile
+
+arm: base
+	echo building "正在服务器打包${NAMESIT}测试镜像..."
+	echo building ${NAMESIT}:${TAG}
+	cp src/main/docker/Dockerfile-arm ./Dockerfile
+	docker buildx build --platform linux/arm64 -t ${REGISTRY}/${ARMORG}/${NAMESIT}:${TAG} . --push
 	rm Dockerfile

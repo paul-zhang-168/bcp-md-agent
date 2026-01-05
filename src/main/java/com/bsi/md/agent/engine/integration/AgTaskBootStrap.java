@@ -4,9 +4,7 @@ import com.bsi.framework.core.utils.EHCacheUtil;
 import com.bsi.framework.core.utils.StringUtils;
 import com.bsi.md.agent.constant.AgConstant;
 import com.bsi.md.agent.engine.plugins.AgAfterOutputPluginManager;
-import com.bsi.md.agent.engine.plugins.AgTaskErrorDataWarnPlugin;
 import com.bsi.md.agent.log.AgTaskLog;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +66,7 @@ public class AgTaskBootStrap {
         context.put("ctx_task_last_success_ts", StringUtils.hasText(lastTs)?lastTs:ts);
         Object obj = engine.input(context);
         context.put(AgConstant.AG_DATA,obj);
+
         if(obj==null && !apiFlag){
             info_log.info("输入节点未查询到数据，结束任务");
             return null;

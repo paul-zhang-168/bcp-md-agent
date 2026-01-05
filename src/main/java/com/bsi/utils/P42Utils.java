@@ -6,9 +6,9 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,10 +22,14 @@ public class P42Utils {
     private static final String EOF_MARKER = "||";
 
     public static List<JSONObject> readData(String filePath) {
+        return readData(filePath,"UTF-8");
+    }
+
+    public static List<JSONObject> readData(String filePath,String encoding) {
 
         List<JSONObject> dataList = new ArrayList<>();
         try {
-            List<String> lines= IOUtils.readLines(new BufferedReader(new FileReader(filePath)));
+            List<String> lines= IOUtils.readLines(Files.newInputStream(Paths.get(filePath)),encoding);
             for(String line : lines) {
                 String[] ls = line.split(LINE_DELIMITER);
                 for (String l : ls) {

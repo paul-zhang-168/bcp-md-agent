@@ -3,6 +3,7 @@ package com.bsi.md.agent.log;
 
 import com.alibaba.fastjson.JSONArray;
 import com.bsi.framework.core.utils.ExceptionUtils;
+import com.bsi.md.agent.config.MongoConfigProperties;
 import com.bsi.utils.MongoDBUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -40,7 +41,10 @@ public class AgTaskLogOutput {
             );
             JSONArray arr = new JSONArray();
             arr.add(taskLog);
-            MongoDBUtils.batchInsert(arr.toJSONString(),"task_run_log");
+            //启动mongodb才输出日志到mongodb
+            if(MongoConfigProperties.isEnabled()){
+                MongoDBUtils.batchInsert(arr.toJSONString(),"task_run_log");
+            }
         }catch (Exception e){
             log.error("任务运行日志输出异常:{}", ExceptionUtils.getFullStackTrace(e));
         }

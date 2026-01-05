@@ -4,20 +4,22 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.bsi.framework.core.utils.DateUtils;
 import com.bsi.framework.core.utils.FwSpringContextUtil;
+import com.bsi.framework.core.utils.StringUtils;
+import com.google.common.collect.Maps;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
+import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -82,6 +84,25 @@ public class MongoDBUtils {
         }
     }
 
+    // 统计指定时间段内的 validSize 和 successSize
+    public static Map<String, Object> getStats(JSONObject jsonFilter) {
+        String startTime = jsonFilter.getString("startTime");
+        String endTime = jsonFilter.getString("endTime");
+        MatchOperation match = Aggregation.match(
+                Criteria.where("timeLocal").gte(startTime).lt(endTime)
+        );
+
+        GroupOperation group = Aggregation.group()
+                .sum("validSize").as("totalValidSize")
+                .sum("successSize").as("totalSuccessSize");
+
+        Aggregation aggregation = Aggregation.newAggregation(match, group);
+
+        return Collections.unmodifiableMap(mongoTemplate.aggregate(aggregation, "task_run_log", Map.class).getMappedResults().stream()
+                .findFirst()
+                .orElseGet(() -> Maps.newHashMap()));
+    }
+
     /**
      * 根据 JSON 字符串表示的过滤条件查询集合中的文档。
      *
@@ -89,39 +110,46 @@ public class MongoDBUtils {
      * @return 匹配的文档列表
      */
     public static List<Document> queryDocuments(JSONObject jsonFilter){
-        // 将 JSON 字符串转换为 Map
         // 解析字段和过滤条件
-        String fields =  jsonFilter.getString("fields");
+        String fields = jsonFilter.getString("fields");
         JSONArray filters = jsonFilter.getJSONArray("filters");
 
-        // 创建查询条件
+        // 构建查询条件
         Criteria criteria = buildCriteriaFromFilters(filters);
 
         // 创建查询对象
         Query query = new Query();
         query.addCriteria(criteria);
 
-        // 添加分页信息
-        /*JSONObject page = jsonFilter.getJSONObject("page");
-        if(page==null){
-            page = new JSONObject();
-            page.put("currentPage",1);
-            page.put("pageSize",1000);
+        // 处理 limit 参数
+        Integer limit = jsonFilter.getInteger("limit");
+        if (limit != null && limit > 0) {
+            query.limit(limit);
         }
-        Pageable pageable = PageRequest.of(page.getInteger("currentPage"), page.getInteger("pageSize"));
-        query.with(pageable);*/
 
+        // 处理排序参数
+        String sortField = jsonFilter.getString("sortField");
+        String sortOrder = jsonFilter.getString("sortOrder");
+        if (sortField != null && !sortField.isEmpty()) {
+            Sort.Direction direction = Sort.Direction.ASC;
+            if (StringUtils.hasText(sortOrder) && "DESC".equalsIgnoreCase(sortOrder)) {
+                direction = Sort.Direction.DESC;
+            }
+            query.with(Sort.by(direction, sortField));
+        }
 
-        // 如果指定了返回字段，则在查询时指定这些字段
+        // 处理返回字段
         if (fields != null && !fields.isEmpty()) {
             String[] fieldArray = fields.split(",");
             for (String field : fieldArray) {
                 query.fields().include(field.trim());
             }
         }
-        long totalCount = mongoTemplate.count(query, jsonFilter.getString("collectionName"));
+
+        // 执行查询
         List<Document> list = mongoTemplate.find(query, Document.class, jsonFilter.getString("collectionName"));
 
+        // 转换 ObjectId 为字符串
         return list.stream().peek(doc -> {
             Object id = doc.get("_id");
             if (id instanceof ObjectId) {

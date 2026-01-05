@@ -13,6 +13,7 @@ import com.bsi.md.agent.engine.factory.AgEngineFactory;
 import com.bsi.md.agent.engine.integration.AgIntegrationEngine;
 import com.bsi.md.agent.engine.integration.AgTaskBootStrap;
 import com.bsi.md.agent.engine.integration.Context;
+import com.bsi.md.agent.engine.pool.AgAsynchronousApiPool;
 import com.bsi.md.agent.entity.dto.*;
 import com.bsi.md.agent.entity.vo.AgIntegrationConfigVo;
 import com.bsi.md.agent.log.AgTaskLog;
@@ -29,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -81,7 +83,7 @@ public class AgConfigController {
      * @param config
      * @throws Exception
      */
-    @PostMapping("/iot/integration/config")
+    @PostMapping(value="/iot/integration/config",produces = MediaType.APPLICATION_JSON_VALUE)
     public Resp updateConfigForIot(HttpServletRequest request, @RequestBody AgConfigDtoForIOT config) throws Exception{
         log.info( "收到IoT Edge控制台下发的配置信息:{}", JSON.toJSONString( config ) );
         //IOT验签
@@ -94,8 +96,15 @@ public class AgConfigController {
         }
         AgConfigDto c = transform(config);
         log.info("转换之后的配置信息:{}",JSON.toJSONString(c));
-
-        return updateConfig(c);
+        log.info("异步刷新配置数据");
+        AgAsynchronousApiPool.commitCached(() -> {
+            try {
+                updateConfig(c);
+            } catch (Exception e) {
+                log.error("异步执行updateConfig出错",e);
+            }
+        });
+        return new Resp( FwHttpStatus.OK.value(),"下发成功");
     }
 
     public Resp deleteConfig(AgConfigDtoForIOT config){
@@ -119,7 +128,7 @@ public class AgConfigController {
      * @param dataSource
      * @throws Exception
      */
-    @PostMapping("/iot/integration/datasource")
+    @PostMapping(value = "/iot/integration/datasource",produces = MediaType.APPLICATION_JSON_VALUE)
     public Resp updateDataSourceForIot(HttpServletRequest request,@RequestBody AgDataSourceDtoForIOT dataSource) throws Exception{
         log.info( "收到IoT Edge控制台下发的数据源信息:{}", JSON.toJSONString( dataSource ) );
         AgDataSourceDto ds = transform(dataSource);
@@ -129,7 +138,15 @@ public class AgConfigController {
         if( FwHttpStatus.FORBIDDEN.value() == rs.getCode() ){
             return rs;
         }
-        return updateDataSource(ds);
+        log.info("异步初始化数据源");
+        AgAsynchronousApiPool.commitCached(() -> {
+            try {
+                updateDataSource(ds);
+            } catch (Exception e) {
+                log.error("异步执行updateDataSource出错",e);
+            }
+        });
+        return new Resp( FwHttpStatus.OK.value(),"下发成功");
     }
 
     /**
@@ -150,7 +167,8 @@ public class AgConfigController {
         for(int i=0;i<jobs.size();i++){
             JSONObject job = jobs.getJSONObject(i);
             JSONObject tmp = new JSONObject();
-            tmp.put("jobId",job.getString("id"));
+            //iot下发的jobId拼接了configId,去除掉
+            tmp.put("jobId",job.getString("id").replace(config.getId()+"_",""));
             tmp.put("enable",job.getBoolean("enabled"));
             tmp.put("jobName",job.getString("name"));
             //输入节点组转
