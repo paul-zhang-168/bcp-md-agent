@@ -99,6 +99,8 @@ ag:
 
 欢迎贡献代码！请阅读 [贡献指南](CONTRIBUTING.md) 了解如何参与项目开发。
 
+本项目遵循 [贡献者公约行为准则](CODE_OF_CONDUCT.md)，参与者需遵守其规定。
+
 ## 许可证
 
 本项目采用 [MIT License](LICENSE) 开源协议。
