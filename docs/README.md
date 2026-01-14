@@ -5,15 +5,13 @@
 ## 目录
 
 ### 快速开始
-- [安装指南](guides/installation.md) - 环境准备和安装步骤
-- [快速入门](guides/quickstart.md) - 5 分钟快速体验
-- [基本概念](guides/concepts.md) - 核心概念和架构
+- [快速入门](guides/quickstart.md) - 5 分钟快速上手
+- [数据源配置](guides/datasource-config.md) - 各种数据库和消息队列配置
+- [脚本开发](guides/script-development.md) - JavaScript 数据转换脚本开发
 
 ### 配置指南
-- [数据源配置](guides/datasource-config.md) - 各种数据库和消息队列配置
-- [任务配置](guides/task-config.md) - 定时任务和触发器配置
-- [脚本开发](guides/script-development.md) - JavaScript 数据转换脚本开发
-- [API 代理配置](guides/api-proxy.md) - API 路由和鉴权配置
+- [OData 查询规范](guides/odata-query.md) - OData 查询语法和示例
+- [故障排查](guides/troubleshooting.md) - 常见问题和解决方案
 
 ### 使用示例
 - [数据库同步](examples/database-sync.md) - 跨数据库数据同步示例
@@ -29,12 +27,11 @@
 
 ### API 参考
 - [REST API](api/rest-api.md) - HTTP API 接口文档
-- [配置 API](api/config-api.md) - 配置管理接口
+- [工具类 API](api/utility-classes.md) - JavaScript 内置工具类完整文档
 
 ### 开发指南
 - [贡献指南](../CONTRIBUTING.md) - 如何参与项目开发
-- [架构设计](guides/architecture.md) - 系统架构和设计理念
-- [扩展开发](guides/extensions.md) - 插件和扩展开发
+- [监控和日志](guides/monitoring.md) - 日志管理和可观测性
 
 ## 支持
 
